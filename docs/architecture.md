@@ -79,10 +79,22 @@ Current behavior:
 - Windows Forms app targeting `net8.0-windows`.
 - Tray icon with show, refresh, and exit commands.
 - Main window showing the local queue snapshot.
+- Command-line queue requests for context menu handoff.
 - Centralized UI strings in `UiText`.
 - Display branding isolated in `ProductBranding`.
 
 It intentionally does not execute file operations yet. The production worker must be connected only after the file-operation executor is real and tested on Windows.
+
+### Current Context Menu Path
+
+The first Explorer integration path avoids COM while the product is still unverified on Windows:
+
+- Current-user registry verbs call the app executable.
+- The app receives `--queue-copy` or `--queue-move`.
+- The app prompts for a destination folder.
+- The queue core persists the job.
+
+This path is less powerful than a native Shell Extension, but it is reversible and safer for the first Windows laptop test.
 
 ### Worker
 

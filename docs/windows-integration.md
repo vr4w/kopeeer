@@ -30,16 +30,24 @@ Planned commands:
 
 Implementation direction:
 
-- Native C++ Shell Extension implementing the relevant context menu interfaces.
-- Gather selected files from Explorer's `IDataObject`.
-- Ask the user for a destination when needed.
-- Send a queue request to the local app or worker.
+- Start with reversible current-user Explorer verbs that invoke the app command line.
+- App command-line entry points ask the user for a destination folder and enqueue the selected file or folder.
+- Keep native C++ Shell Extension work for the later stage where richer multi-select and deeper Explorer context is required.
 
 Why first:
 
 - Clear user intent.
 - Easier to test than modifier-based drag-and-drop.
 - Does not need to intercept normal left-button drag behavior.
+- Reversible without COM registration during early Windows testing.
+
+Current prototype:
+
+- `FileOperationQueue.App.exe --queue-copy "<path>"`
+- `FileOperationQueue.App.exe --queue-move "<path>"`
+- `tools/windows/install-context-menu-dev.ps1`
+- `tools/windows/uninstall-context-menu-dev.ps1`
+- `installer/inno/Kopeeer.iss`
 
 ## Drag-and-drop Integration
 
@@ -63,6 +71,8 @@ Research questions:
 - How does this interact with left-button drag, right-button drag, network locations, libraries, and virtual folders?
 
 Until a Windows prototype proves this, drag-and-drop integration is planned research, not a version 0.1 dependency.
+
+See [drag-drop-explorer-hook.md](drag-drop-explorer-hook.md).
 
 ## Copy Hook Handler Is Not The Solution
 

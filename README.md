@@ -65,6 +65,7 @@ The first code is intentionally small:
 - JSON queue persistence.
 - Local worker boundary.
 - Windows tray UI scaffold for viewing the queue.
+- Command-line queue handoff for early Explorer context menu tests.
 - No Shell Extension.
 - No Explorer hook.
 - No production copy engine yet.
@@ -73,6 +74,8 @@ Development target:
 
 - .NET 8 SDK for the queue core.
 - Windows 10/11 for real file-operation and Explorer integration testing.
+
+See [docs/windows-test-plan.md](docs/windows-test-plan.md) before treating Windows behavior as verified.
 
 ## Freeware
 

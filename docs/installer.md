@@ -19,8 +19,16 @@ Inno Setup strengths:
 - Simpler authoring model.
 - Friendly for small Windows utilities.
 - Good candidate if the first installer does not need complex MSI behavior.
+- Good first candidate for current-user context menu registration while the native Shell Extension remains unproven.
 
 The final choice should be based on registration reliability, uninstall cleanliness, upgrade behavior, and how clearly the installer can explain Explorer integration.
+
+Current repository state:
+
+- `installer/inno/Kopeeer.iss` is a draft Inno Setup script.
+- It installs the app from a future publish output folder.
+- It registers current-user context menu commands for files and folders.
+- It does not install a native Shell Extension or drag-and-drop hook.
 
 ## Installer Goals
 
@@ -41,6 +49,8 @@ Initial options:
 - Enable experimental drag-and-drop integration only when it is proven and clearly marked.
 - Start the app after install.
 - Start the app with Windows.
+
+The drag-and-drop hook must remain opt-in and experimental until validated on Windows 10 and Windows 11.
 
 ## Language Strategy
 

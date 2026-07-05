@@ -2,6 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>FileOperationQueue.App</RootNamespace>
     <AssemblyName>FileOperationQueue.App</AssemblyName>
@@ -10,4 +11,3 @@
     <ProjectReference Include="../FileOperationQueue.Core/FileOperationQueue.Core.csproj" />
   </ItemGroup>
 </Project>
-

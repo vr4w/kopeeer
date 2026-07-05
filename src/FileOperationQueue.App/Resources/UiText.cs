@@ -17,5 +17,6 @@ public static class UiText
     public const string Sources = "Sources";
     public const string Destination = "Destination";
     public const string Error = "Error";
+    public const string SelectDestination = "Select destination folder";
+    public const string JobQueuedFormat = "Queued {0} item(s) for {1}.";
 }
-

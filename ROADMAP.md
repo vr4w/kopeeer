@@ -53,6 +53,13 @@ Current status:
 - Validate registration and uninstallation on Windows 10 and Windows 11.
 - Treat this as the first production Explorer integration path.
 
+Current status:
+
+- App command-line queue entry points are in place for context menu handoff.
+- Reversible current-user registry dev scripts are in place.
+- Draft Inno Setup installer registration is in place.
+- Windows verification is required before this becomes a release feature.
+
 ## Phase 4: Drag-and-drop / Shell Integration Research
 
 - Research the safest Shell mechanism for the modifier-based drop workflow.
@@ -60,6 +67,11 @@ Current status:
 - Confirm whether the app can reliably take over a drop without breaking normal Explorer behavior.
 - Assume this belongs after 0.1 unless the prototype is exceptionally clean.
 - Do not ship a production-ready Explorer hook until stability is proven.
+
+Current status:
+
+- Prototype requirements and Windows test checklist are documented.
+- No native drop hook is installed by default.
 
 ## Phase 5: Installer And Release Packaging
 
