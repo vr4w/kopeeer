@@ -4,6 +4,8 @@ The original product idea is still the goal: hold a modifier such as `ALT + SHIF
 
 This document defines the prototype track. It is not yet production-ready behavior.
 
+The current alpha does not intercept live Explorer drops. It uses the safer context menu path while the native Explorer hook is researched and tested on Windows.
+
 ## Desired Behavior
 
 - Normal Explorer drag and drop remains unchanged.
@@ -19,9 +21,9 @@ This document defines the prototype track. It is not yet production-ready behavi
 - Does the behavior differ between Windows 10 and Windows 11?
 - Does it work for files, folders, network drives, external drives, long paths, and protected folders?
 
-## Candidate Technical Direction
+## Recommended Prototype Direction
 
-The likely prototype is a native C++/Win32/COM Shell Extension that implements a drop target or related Shell handler.
+The recommended prototype is a native C++/Win32/COM Shell Extension spike. The first thing to prove is not copying files; it is whether Windows exposes enough reliable drop context for Kopeeer to queue the operation without breaking normal Explorer behavior.
 
 The Shell Extension must:
 
@@ -32,6 +34,8 @@ The Shell Extension must:
 - Send a local queue request to the app or worker.
 - Decline handling when the modifier is not held.
 - Fail back to normal Explorer behavior when Kopeeer is unavailable.
+
+The .NET app already has the beginning of the required handoff shape: enqueue requests can be sent to the running app through a local named pipe. A native Shell Extension should reuse that boundary instead of doing file work inside Explorer.
 
 ## Safety Rule
 
@@ -56,4 +60,3 @@ The first installer path should remain the explicit context menu integration. Dr
 - `ALT + SHIFT` held.
 - Right-button drag.
 - Uninstall and Explorer restart.
-

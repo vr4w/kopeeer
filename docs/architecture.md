@@ -80,7 +80,7 @@ Current behavior:
 - Sequential queue processing.
 - Local logging to `logs/kopeeer.log`.
 
-It intentionally does not integrate with Explorer yet. This is the first safe local test version.
+It has a first safe Explorer context menu integration path. It still does not install a native Shell Extension or intercept live drag-and-drop.
 
 ### Experimental Context Menu Path
 
@@ -89,9 +89,10 @@ The first Explorer integration path should avoid COM while the product is still 
 - Current-user registry verbs call the app executable.
 - The app receives `--enqueue --operation copy|move --pick-target --sources "<path>"`.
 - The app prompts for a destination folder.
-- The queue core persists the job.
+- The running app receives the request through command-line startup or single-instance named pipe handoff.
+- The queue core stores the job in memory for the current alpha session.
 
-This path is less powerful than a native Shell Extension, but it is reversible and safer for later Windows testing. It is not part of the manual `0.1.0-alpha` test app.
+This path is less powerful than a native Shell Extension, but it is reversible and safer for Windows testing.
 
 ### Worker
 
@@ -110,9 +111,10 @@ Preferred direction:
 
 Current implementation:
 
-- `IFileOperationExecutor` defines the execution boundary.
-- `NoOpFileOperationExecutor` exists only as a safe smoke-test executor.
-- Production copy/move behavior is not implemented yet.
+- `FileOperationProcessor` performs safe file/folder copy and move operations.
+- Existing targets fail clearly instead of being overwritten silently.
+- Move currently uses copy-then-delete behavior after a successful copy.
+- Progress remains coarse and should be improved later.
 
 ### File Operation Layer
 

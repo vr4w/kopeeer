@@ -30,9 +30,11 @@ Current repository state:
 - It installs the app from `artifacts\publish\Kopeeer.App`.
 - It writes the installer to `artifacts\installer`.
 - It installs into the current user's local app folder and should not require admin rights.
-- It registers current-user context menu commands for files and folders.
+- It can register current-user context menu commands for files and folders through the installer option `Add Explorer context menu commands`.
+- It uses separate copy and cut icon assets for the Explorer menu entries.
 - It does not install a native Shell Extension or drag-and-drop hook.
 - The current alpha context menu registration is tested first through `scripts/register-context-menu.ps1` and `scripts/unregister-context-menu.ps1`.
+- GitHub Actions can build the installer as an artifact, and tagged builds can publish a prerelease.
 
 ## Build Current Alpha Installer
 

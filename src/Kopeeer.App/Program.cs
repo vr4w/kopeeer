@@ -7,6 +7,25 @@ internal static class Program
     {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-        Application.Run(new MainForm(StartupQueueRequest.TryParse(Environment.GetCommandLineArgs().Skip(1).ToArray())));
+
+        var startupRequest = StartupQueueRequest.TryParse(Environment.GetCommandLineArgs().Skip(1).ToArray());
+        using var singleInstanceMutex = new Mutex(
+            initiallyOwned: true,
+            name: SingleInstanceCoordinator.MutexName,
+            createdNew: out var isFirstInstance);
+
+        if (!isFirstInstance)
+        {
+            if (startupRequest is not null)
+            {
+                SingleInstanceCoordinator.TrySendToRunningInstance(startupRequest);
+            }
+
+            return;
+        }
+
+        using var form = new MainForm(startupRequest);
+        using var coordinator = SingleInstanceCoordinator.Start(form.ApplyExternalQueueRequestAsync);
+        Application.Run(form);
     }
 }

@@ -4,7 +4,7 @@ namespace Kopeeer.App;
 
 public sealed record StartupQueueRequest(
     FileOperationType OperationType,
-    IReadOnlyList<string> SourcePaths,
+    string[] SourcePaths,
     string? TargetFolder,
     bool PickTarget)
 {

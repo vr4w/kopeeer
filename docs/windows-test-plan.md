@@ -7,7 +7,7 @@ Use this plan on a Windows 10 or Windows 11 laptop before treating Explorer inte
 - Windows 10 or Windows 11, 64-bit.
 - .NET 8 SDK.
 - Git.
-- Optional later: Inno Setup.
+- Inno Setup 6 for installer builds.
 
 ## First Build Check
 
@@ -88,20 +88,50 @@ Test:
 - Right-click a file.
 - Choose "Copy with Kopeeer..."
 - Select a destination folder.
-- Open Kopeeer.
+- Confirm Kopeeer opens automatically.
 - Confirm the job appears in the queue.
+- Confirm processing starts without pressing "Start queue".
+- Confirm the menu entry shows the copy icon.
 
 Repeat for:
 
 - "Move with Kopeeer..."
 - A folder.
 - A path with spaces.
+- A second Explorer request while Kopeeer is already open.
+
+Expected result:
+
+- The second request should go to the existing Kopeeer window.
+- The move entry should show the cut icon.
+- The installer and script registrations should both use the same labels and command behavior.
 
 Uninstall dev context menu entries:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\unregister-context-menu.ps1
 ```
+
+## Installer Check
+
+Build the installer:
+
+```powershell
+scripts\build-installer.ps1
+```
+
+Run:
+
+```powershell
+artifacts\installer\Kopeeer-Setup-0.2.0-alpha.exe
+```
+
+Expected result:
+
+- Installer finishes without admin rights.
+- `Add Explorer context menu commands` is visible as an option.
+- With the option enabled, copy and move entries appear in Explorer.
+- Uninstall removes the installed app and the current-user context menu entries.
 
 ## Drag-and-drop Hook Check
 

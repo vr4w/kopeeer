@@ -23,7 +23,10 @@ required_files = [
     "src/Kopeeer.App/Kopeeer.App.csproj",
     "src/Kopeeer.App/MainForm.cs",
     "src/Kopeeer.App/Program.cs",
+    "src/Kopeeer.App/SingleInstanceCoordinator.cs",
     "src/Kopeeer.App/StartupQueueRequest.cs",
+    "src/Kopeeer.App/Assets/copy.ico",
+    "src/Kopeeer.App/Assets/cut.ico",
     "src/Kopeeer.Core/Kopeeer.Core.csproj",
     "src/Kopeeer.Core/InMemoryJobQueue.cs",
     "src/Kopeeer.Core/QueueJob.cs",
@@ -63,7 +66,11 @@ if missing:
 
 for path in Path(".").rglob("*"):
     if path.is_file() and ".git" not in path.parts:
-        text = path.read_text(encoding="utf-8")
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+
         if "\t" in text:
             print(f"Tab character found in {path}")
             sys.exit(1)

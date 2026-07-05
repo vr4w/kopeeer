@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        FileRail is intentionally small. Please describe the workflow first.
+        Kopeeer is intentionally small. Please describe the workflow first.
   - type: textarea
     id: workflow
     attributes:
@@ -42,4 +42,3 @@ body:
         - Other
     validations:
       required: true
-

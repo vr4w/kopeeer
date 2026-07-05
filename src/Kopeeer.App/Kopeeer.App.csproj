@@ -11,5 +11,8 @@
     <ProjectReference Include="../Kopeeer.Core/Kopeeer.Core.csproj" />
     <ProjectReference Include="../Kopeeer.Worker/Kopeeer.Worker.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets/copy.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets/cut.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>
-

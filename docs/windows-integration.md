@@ -48,6 +48,8 @@ Current prototype:
 - `scripts/register-context-menu.ps1`
 - `scripts/unregister-context-menu.ps1`
 - `installer/inno/Kopeeer.iss`
+- `src/Kopeeer.App/Assets/copy.ico`
+- `src/Kopeeer.App/Assets/cut.ico`
 
 Registry paths:
 
@@ -56,9 +58,12 @@ Registry paths:
 - `HKCU\Software\Classes\Directory\shell\Kopeeer.CopyWith`
 - `HKCU\Software\Classes\Directory\shell\Kopeeer.MoveWith`
 
-Known limitation:
+Current behavior:
 
-- Single-instance IPC is not implemented yet. If Kopeeer is already running, a context menu request launches a new process for now.
+- If Kopeeer is already running, Explorer enqueue requests are handed to the running window through a local named pipe.
+- Context menu requests start processing after the target folder is selected.
+- The installer can add or skip context menu registration through an explicit setup option.
+- The context menu entries use separate copy and cut icons.
 
 ## Drag-and-drop Integration
 

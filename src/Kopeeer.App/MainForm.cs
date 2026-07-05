@@ -260,9 +260,6 @@ public sealed class MainForm : Form
         _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Status", DataPropertyName = nameof(QueueJob.Status), Width = 90 });
         _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Source", DataPropertyName = nameof(QueueJob.SourcePath), AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 38 });
         _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Target", DataPropertyName = nameof(QueueJob.TargetFolder), AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 28 });
-        _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Created", DataPropertyName = nameof(QueueJob.CreatedAt), Width = 145 });
-        _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Started", DataPropertyName = nameof(QueueJob.StartedAt), Width = 145 });
-        _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Completed", DataPropertyName = nameof(QueueJob.CompletedAt), Width = 145 });
         _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Error", DataPropertyName = nameof(QueueJob.ErrorMessage), AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 24 });
     }
 
@@ -449,7 +446,18 @@ public sealed class MainForm : Form
         _summaryLabel.Text = BuildSummary();
     }
 
-    private async Task ApplyStartupRequestAsync(StartupQueueRequest? request)
+    public Task ApplyExternalQueueRequestAsync(StartupQueueRequest request)
+    {
+        if (InvokeRequired)
+        {
+            BeginInvoke((MethodInvoker)(async () => await ApplyStartupRequestAsync(request, autoStart: true)));
+            return Task.CompletedTask;
+        }
+
+        return ApplyStartupRequestAsync(request, autoStart: true);
+    }
+
+    private async Task ApplyStartupRequestAsync(StartupQueueRequest? request, bool autoStart = true)
     {
         if (request is null)
         {
@@ -481,7 +489,13 @@ public sealed class MainForm : Form
         }
 
         AddJobs(request.OperationType, request.SourcePaths, targetFolder);
+        WindowState = FormWindowState.Normal;
+        Show();
         Activate();
-        await Task.CompletedTask;
+
+        if (autoStart && !_queueProcessor.IsRunning && _jobs.Any(job => job.Status == JobStatus.Pending))
+        {
+            await StartQueueAsync();
+        }
     }
 }

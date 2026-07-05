@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping FileRail become calmer and more reliable.
+        Thanks for helping Kopeeer become calmer and more reliable.
   - type: textarea
     id: what-happened
     attributes:
@@ -42,4 +42,3 @@ body:
     attributes:
       label: Notes
       description: Add logs, screenshots, or details about source and destination folders if useful. Do not include private file contents.
-

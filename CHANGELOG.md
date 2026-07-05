@@ -14,11 +14,18 @@ The format is based on Keep a Changelog, and this project intends to follow sema
 - Target picker flow for Explorer-selected files/folders.
 - More queue-focused app layout with manual job creation behind "Add job manually...".
 - Installer builder script that publishes the app and creates an Inno Setup installer EXE.
+- Copy and cut icon assets for Explorer context menu entries.
+- Single-instance handoff so Explorer enqueue requests go to the running Kopeeer window.
+- GitHub Actions installer artifact and prerelease publishing path.
 
 ### Changed
 
 - Removed obsolete duplicate `FileOperationQueue.*` prototype projects from `src/` and `tests/`.
 - Updated alpha UI to make the queue list the primary surface.
+- Simplified README around the installer-first tester flow.
+- Simplified the queue table by removing timestamp columns from the main view.
+- Made Explorer-started queue jobs begin processing automatically after the target folder is selected.
+- Added an installer option for Explorer context menu registration.
 
 ### Fixed
 
@@ -26,7 +33,7 @@ The format is based on Keep a Changelog, and this project intends to follow sema
 
 ### Known Risks
 
-- Single-instance handoff is not implemented yet; context menu launches a new app instance for now.
+- Single-instance handoff is new and still needs Windows validation with repeated Explorer requests.
 - Windows 11 may place classic context menu entries behind "Show more options".
 - Context menu integration is an alpha prototype and does not install a Shell Extension.
 
