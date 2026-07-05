@@ -35,19 +35,16 @@ Modifier-based drag-and-drop should remain a research spike until proven on Wind
 
 ## Current Implementation Boundary
 
-The first code step is intentionally limited to `FileOperationQueue.Core`:
+The first code step created a neutral queue prototype. After the first Windows alpha launched successfully, the active buildable path was simplified to `Kopeeer.sln`:
 
-- Job model.
-- Queue status transitions.
-- JSON queue persistence.
-- Local worker loop.
-- Executor interface.
+- `Kopeeer.App`
+- `Kopeeer.Core`
+- `Kopeeer.Worker`
 - No Shell Extension.
 - No COM code.
 - No Explorer hook.
-- No production file-copy engine yet.
 
-The current worker uses an executor abstraction. This keeps queue behavior testable before deciding whether production file operations use `IFileOperation`, lower-level Windows APIs, or a native component.
+This keeps the alpha easy to build and test before returning to deeper Explorer integration.
 
 ## Rejected As Primary Architecture
 

@@ -1,5 +1,5 @@
 ; Kopeeer installer draft.
-; Build this on Windows after publishing FileOperationQueue.App.
+; Build this on Windows after publishing Kopeeer.App.
 
 #define AppName "Kopeeer"
 #define AppVersion "0.1.0"

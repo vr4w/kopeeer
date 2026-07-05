@@ -45,6 +45,8 @@ Expected result:
 - Jobs run one at a time.
 - `logs\kopeeer.log` is written.
 
+The app should keep "Add to queue" disabled until both source and target are selected. "Start queue" should stay disabled until at least one pending job exists.
+
 ## Manual Copy/Move Checks
 
 Create a temporary test folder with throwaway files. Do not use important files for the first test.
@@ -62,6 +64,7 @@ Expected result:
 - Existing targets are not overwritten.
 - Failed jobs show an error message.
 - The app does not crash.
+- Status summary updates Pending, Running, Completed, and Failed counts.
 
 ## Context Menu Dev Check
 

@@ -20,15 +20,6 @@ required_files = [
     "docs/branding.md",
     "docs/windows-test-plan.md",
     ".github/workflows/windows-build.yml",
-    "src/FileOperationQueue.Core/FileOperationQueue.Core.csproj",
-    "src/FileOperationQueue.Core/Queue/FileOperationJob.cs",
-    "src/FileOperationQueue.Core/Queue/OperationQueue.cs",
-    "src/FileOperationQueue.Core/Worker/LocalQueueWorker.cs",
-    "src/FileOperationQueue.App/FileOperationQueue.App.csproj",
-    "src/FileOperationQueue.App/Program.cs",
-    "src/FileOperationQueue.App/Commands/CommandLineQueueHandler.cs",
-    "src/FileOperationQueue.App/Tray/QueueApplicationContext.cs",
-    "src/FileOperationQueue.App/Ui/MainForm.cs",
     "src/Kopeeer.App/Kopeeer.App.csproj",
     "src/Kopeeer.App/MainForm.cs",
     "src/Kopeeer.App/Program.cs",
@@ -46,6 +37,19 @@ required_files = [
     "tools/windows/uninstall-context-menu-dev.ps1",
     "docs/drag-drop-explorer-hook.md",
 ]
+
+obsolete_paths = [
+    "src/FileOperationQueue.App",
+    "src/FileOperationQueue.Core",
+    "tests/FileOperationQueue.Core.Tests",
+]
+
+present_obsolete_paths = [path for path in obsolete_paths if Path(path).exists()]
+if present_obsolete_paths:
+    print("Obsolete duplicate project paths found:")
+    for path in present_obsolete_paths:
+        print(f"- {path}")
+    sys.exit(1)
 
 missing = [path for path in required_files if not Path(path).is_file()]
 if missing:

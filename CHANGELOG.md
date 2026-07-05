@@ -24,6 +24,8 @@ The format is based on Keep a Changelog, and this project intends to follow sema
 - Safe file/folder copy and move behavior that fails instead of overwriting existing targets.
 - Basic local logging to `logs/kopeeer.log`.
 - README build/run instructions and helper scripts.
+- Alpha UI polish with clearer layout, button state handling, readable queue table, and status summary.
+- Cleanup of obsolete duplicate `FileOperationQueue.*` prototype projects from `src/` and `tests/`.
 - Windows integration notes covering Shell Extensions, context menus, drag-and-drop risk, copy hooks, and `IFileOperation`.
 - Branding note for current working display name `Kopeeer` and repository codename `file-operation-queue`.
 - English-first localization strategy for version 0.1.

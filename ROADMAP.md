@@ -29,6 +29,7 @@ Current status:
 - Jobs run sequentially in memory.
 - First safe copy/move execution exists for manual alpha testing.
 - Existing targets fail instead of being overwritten.
+- Obsolete `FileOperationQueue.*` prototype projects have been removed from the build path.
 
 ## Phase 2: Tray App / Minimal UI
 
@@ -44,6 +45,8 @@ Current status:
 - A plain runnable WinForms alpha app exists under `src/Kopeeer.App`.
 - Manual file/folder source selection, target selection, copy/move selection, queue display, and queue start are in place.
 - It writes a test log to `logs/kopeeer.log`.
+- Buttons now enable only when the current action is valid.
+- The queue table and status summary are more readable.
 - Windows runtime verification is still required.
 
 ## Phase 3: Explorer Context Menu Integration

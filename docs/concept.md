@@ -31,11 +31,11 @@ The product should not do in the early versions:
 
 Recommended direction for version 0.1:
 
-- `FileOperationQueue.ShellExtension`: C++/Win32 in-process COM component for Explorer integration.
-- `FileOperationQueue.App`: .NET tray app for queue display and settings.
-- `FileOperationQueue.Core`: shared queue model, job state, settings, and IPC contracts.
-- `FileOperationQueue.Worker`: .NET background worker that performs copy and move jobs through a controlled Windows file-operation layer.
-- `FileOperationQueue.Installer`: WiX installer for registration, removal, and optional integration choices.
+- `Kopeeer.ShellExtension`: future C++/Win32 in-process COM component for Explorer integration.
+- `Kopeeer.App`: .NET desktop app for queue display and settings.
+- `Kopeeer.Core`: shared queue model, job state, settings, and contracts.
+- `Kopeeer.Worker`: .NET background worker that performs copy and move jobs through a controlled file-operation layer.
+- `Kopeeer.Installer`: future installer project for registration, removal, and optional integration choices.
 
 The Shell Extension should never become the worker. Explorer should only load a small integration component that validates input and hands work to the app or worker.
 
@@ -187,16 +187,16 @@ Proposed future structure:
     localization.md
     branding.md
   src/
-    FileOperationQueue.App/
-    FileOperationQueue.Core/
-    FileOperationQueue.Worker/
-    FileOperationQueue.ShellExtension/
-    FileOperationQueue.Installer/
+    Kopeeer.App/
+    Kopeeer.Core/
+    Kopeeer.Worker/
+    Kopeeer.ShellExtension/
+    Kopeeer.Installer/
   samples/
   tests/
-    FileOperationQueue.Core.Tests/
-    FileOperationQueue.Worker.Tests/
-    FileOperationQueue.Integration.Tests/
+    Kopeeer.Core.Tests/
+    Kopeeer.Worker.Tests/
+    Kopeeer.Integration.Tests/
   tools/
   .github/
     FUNDING.yml

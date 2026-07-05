@@ -122,6 +122,6 @@ Potential visual language:
 - Keep the product display name in one obvious place once code exists.
 - Do not scatter user-facing strings across the codebase.
 - Avoid naming internal namespaces, protocols, or storage formats after a temporary public name when a neutral term will work.
-- Prefer neutral internal terms such as `FileOperationQueue`, `Queue`, `Job`, `Worker`, and `ShellExtension`.
+- Prefer neutral internal concepts such as `Queue`, `Job`, `Worker`, and `ShellExtension`.
 - Treat `Kopeeer` as display text, not architecture.
 - Do not rename code namespaces, packages, executable names, or installer identifiers to `Kopeeer` until the name is finally approved.

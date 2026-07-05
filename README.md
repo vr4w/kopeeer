@@ -107,6 +107,62 @@ Or:
 scripts\run.ps1
 ```
 
+## Testing The Alpha App
+
+Use throwaway files first. Do not test with important production data.
+
+Create a test area:
+
+```powershell
+mkdir C:\Temp\KopeeerTest
+mkdir C:\Temp\KopeeerTest\Source
+mkdir C:\Temp\KopeeerTest\Target
+"hello" | Set-Content C:\Temp\KopeeerTest\Source\example.txt
+mkdir C:\Temp\KopeeerTest\Source\ExampleFolder
+"inside folder" | Set-Content C:\Temp\KopeeerTest\Source\ExampleFolder\note.txt
+```
+
+Test file copy:
+
+- Run Kopeeer.
+- Choose `Source file...`.
+- Select `C:\Temp\KopeeerTest\Source\example.txt`.
+- Choose target folder `C:\Temp\KopeeerTest\Target`.
+- Select `Copy`.
+- Add to queue.
+- Start queue.
+- Confirm `C:\Temp\KopeeerTest\Target\example.txt` exists.
+
+Test file move:
+
+- Create another test file in `Source`.
+- Select it as source.
+- Select `Move`.
+- Add to queue and start.
+- Confirm the file appears in `Target` and disappears from `Source`.
+
+Test folder copy:
+
+- Choose `Source folder...`.
+- Select `C:\Temp\KopeeerTest\Source\ExampleFolder`.
+- Select target folder `C:\Temp\KopeeerTest\Target`.
+- Select `Copy`.
+- Add to queue and start.
+- Confirm `C:\Temp\KopeeerTest\Target\ExampleFolder\note.txt` exists.
+
+Test conflict handling:
+
+- Try copying `example.txt` to `Target` again.
+- The job should become `Failed`.
+- Existing target files or folders must not be overwritten.
+- The error message should explain that the target already exists.
+
+Logs are written to:
+
+```text
+logs/kopeeer.log
+```
+
 ## What Works In 0.1.0-alpha
 
 - Manual file/folder selection.

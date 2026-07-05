@@ -62,13 +62,9 @@ Purpose:
 - Keep internal state language-neutral.
 - Provide a stable contract between UI and worker.
 
-Current implementation:
+Earlier prototype note:
 
-- `FileOperationQueue.Core` contains the first queue model and local worker boundary.
-- `OperationQueue` owns enqueue and status transitions.
-- `JsonFileQueueStore` persists queue snapshots locally.
-- `LocalQueueWorker` processes a single active job through an executor abstraction.
-- No Shell Extension or Explorer code is included.
+The initial neutral `FileOperationQueue.*` prototype projects were removed after the first Windows alpha started successfully. The active buildable path is now `Kopeeer.sln` with `Kopeeer.App`, `Kopeeer.Core`, and `Kopeeer.Worker`.
 
 ### Current Alpha UI
 
@@ -164,16 +160,16 @@ Planned structure when implementation starts:
 
 ```text
 src/
-  FileOperationQueue.App/
-  FileOperationQueue.Core/
-  FileOperationQueue.Worker/
-  FileOperationQueue.ShellExtension/
-  FileOperationQueue.Installer/
+  Kopeeer.App/
+  Kopeeer.Core/
+  Kopeeer.Worker/
+  Kopeeer.ShellExtension/
+  Kopeeer.Installer/
 tests/
-  FileOperationQueue.Core.Tests/
-  FileOperationQueue.Worker.Tests/
-  FileOperationQueue.Integration.Tests/
+  Kopeeer.Core.Tests/
+  Kopeeer.Worker.Tests/
+  Kopeeer.Integration.Tests/
 tools/
 ```
 
-These names are intentionally neutral. The product display name can change without renaming the architecture.
+The product name can still change later, but the active alpha code path should not carry duplicate project families.
