@@ -13,6 +13,7 @@ The format is based on Keep a Changelog, and this project intends to follow sema
 - Architecture overview for the recommended component split and technical risks.
 - Architecture decision for the recommended version 0.1 mixed Windows-native architecture.
 - Initial `FileOperationQueue.Core` project with queue model, JSON persistence, status transitions, and local worker boundary.
+- Initial `FileOperationQueue.App` Windows tray UI scaffold for displaying the local queue.
 - Windows integration notes covering Shell Extensions, context menus, drag-and-drop risk, copy hooks, and `IFileOperation`.
 - Branding note for current working display name `Kopeeer` and repository codename `file-operation-queue`.
 - English-first localization strategy for version 0.1.
@@ -23,3 +24,4 @@ The format is based on Keep a Changelog, and this project intends to follow sema
 - Deep drag-and-drop integration from Explorer is not solved yet.
 - Copy Hook Handlers are not a full queueing solution because they can approve or block operations, but do not perform the operation.
 - Shell Extension registration, unloading, crash isolation, and installer cleanup need dedicated Windows testing.
+- The tray app targets Windows and still needs verification on a Windows machine with the .NET SDK installed.

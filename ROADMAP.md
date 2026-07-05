@@ -35,6 +35,13 @@ Current status:
 - Keep UI copy English-first and centralized.
 - Avoid dashboard-style complexity.
 
+Current status:
+
+- First Windows Forms tray UI scaffold is in place.
+- It displays the local queue file and can refresh from the tray/menu.
+- It does not execute file operations yet.
+- Windows runtime verification is still required.
+
 ## Phase 3: Explorer Context Menu Integration
 
 - Add explicit Explorer commands:

@@ -21,6 +21,10 @@ required_files = [
     "src/FileOperationQueue.Core/Queue/FileOperationJob.cs",
     "src/FileOperationQueue.Core/Queue/OperationQueue.cs",
     "src/FileOperationQueue.Core/Worker/LocalQueueWorker.cs",
+    "src/FileOperationQueue.App/FileOperationQueue.App.csproj",
+    "src/FileOperationQueue.App/Program.cs",
+    "src/FileOperationQueue.App/Tray/QueueApplicationContext.cs",
+    "src/FileOperationQueue.App/Ui/MainForm.cs",
 ]
 
 missing = [path for path in required_files if not Path(path).is_file()]
@@ -38,4 +42,3 @@ for path in Path(".").rglob("*"):
             sys.exit(1)
 
 print("Project structure validation passed.")
-

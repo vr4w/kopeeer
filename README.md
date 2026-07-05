@@ -64,6 +64,7 @@ The first code is intentionally small:
 - Queue job model and statuses.
 - JSON queue persistence.
 - Local worker boundary.
+- Windows tray UI scaffold for viewing the queue.
 - No Shell Extension.
 - No Explorer hook.
 - No production copy engine yet.

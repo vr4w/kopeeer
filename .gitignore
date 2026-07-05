@@ -3,6 +3,7 @@ bin/
 obj/
 out/
 artifacts/
+.dotnet/
 
 # User/local files
 .DS_Store
@@ -20,4 +21,3 @@ artifacts/
 *.log
 *.tmp
 *.temp
-

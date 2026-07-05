@@ -70,6 +70,20 @@ Current implementation:
 - `LocalQueueWorker` processes a single active job through an executor abstraction.
 - No Shell Extension or Explorer code is included.
 
+### Current Tray UI Scaffold
+
+The first app project is `FileOperationQueue.App`.
+
+Current behavior:
+
+- Windows Forms app targeting `net8.0-windows`.
+- Tray icon with show, refresh, and exit commands.
+- Main window showing the local queue snapshot.
+- Centralized UI strings in `UiText`.
+- Display branding isolated in `ProductBranding`.
+
+It intentionally does not execute file operations yet. The production worker must be connected only after the file-operation executor is real and tested on Windows.
+
 ### Worker
 
 Purpose:
