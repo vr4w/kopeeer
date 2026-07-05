@@ -126,16 +126,16 @@ bool IsAltShiftPressed(DWORD keyState)
     return fromDropState || fromKeyboard;
 }
 
-std::wstring ReadRegisteredAppPath()
+std::wstring TryReadRegisteredAppPath(HKEY root, const wchar_t* classIdText)
 {
     wchar_t value[MAX_PATH * 4]{};
     DWORD valueSize = sizeof(value);
 
     std::wstring key = L"Software\\Classes\\CLSID\\";
-    key += DropHandlerClassIdText;
+    key += classIdText;
 
     const auto result = RegGetValueW(
-        HKEY_CURRENT_USER,
+        root,
         key.c_str(),
         AppPathValueName,
         RRF_RT_REG_SZ,
@@ -146,6 +146,30 @@ std::wstring ReadRegisteredAppPath()
     if (result == ERROR_SUCCESS && value[0] != L'\0')
     {
         return value;
+    }
+
+    return {};
+}
+
+std::wstring ReadRegisteredAppPath()
+{
+    const wchar_t* classIds[] = {
+        DragDropMenuClassIdText,
+        DropHandlerClassIdText,
+        CopyHookClassIdText
+    };
+
+    for (const auto classIdText : classIds)
+    {
+        if (auto appPath = TryReadRegisteredAppPath(HKEY_CURRENT_USER, classIdText); !appPath.empty())
+        {
+            return appPath;
+        }
+
+        if (auto appPath = TryReadRegisteredAppPath(HKEY_LOCAL_MACHINE, classIdText); !appPath.empty())
+        {
+            return appPath;
+        }
     }
 
     wchar_t envValue[MAX_PATH * 4]{};
