@@ -25,7 +25,10 @@ The project should grow in small, testable phases. Each phase should leave the t
 Current status:
 
 - First queue model, JSON persistence, and local worker boundary are in place.
-- Production file-copy execution is still intentionally deferred.
+- `Kopeeer.Core` and `Kopeeer.Worker` now provide the first manual alpha queue path.
+- Jobs run sequentially in memory.
+- First safe copy/move execution exists for manual alpha testing.
+- Existing targets fail instead of being overwritten.
 
 ## Phase 2: Tray App / Minimal UI
 
@@ -38,8 +41,9 @@ Current status:
 Current status:
 
 - First Windows Forms tray UI scaffold is in place.
-- It displays the local queue file and can refresh from the tray/menu.
-- It does not execute file operations yet.
+- A plain runnable WinForms alpha app exists under `src/Kopeeer.App`.
+- Manual file/folder source selection, target selection, copy/move selection, queue display, and queue start are in place.
+- It writes a test log to `logs/kopeeer.log`.
 - Windows runtime verification is still required.
 
 ## Phase 3: Explorer Context Menu Integration

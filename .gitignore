@@ -18,6 +18,7 @@ artifacts/
 !.vscode/extensions.json
 
 # Logs and local state
+logs/
 *.log
 *.tmp
 *.temp

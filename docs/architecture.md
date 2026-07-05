@@ -70,31 +70,32 @@ Current implementation:
 - `LocalQueueWorker` processes a single active job through an executor abstraction.
 - No Shell Extension or Explorer code is included.
 
-### Current Tray UI Scaffold
+### Current Alpha UI
 
-The first app project is `FileOperationQueue.App`.
+The first manually testable app is `Kopeeer.App`.
 
 Current behavior:
 
 - Windows Forms app targeting `net8.0-windows`.
-- Tray icon with show, refresh, and exit commands.
-- Main window showing the local queue snapshot.
-- Command-line queue requests for context menu handoff.
-- Centralized UI strings in `UiText`.
-- Display branding isolated in `ProductBranding`.
+- Manual source file or folder selection.
+- Manual target folder selection.
+- Copy or move operation selection.
+- In-memory queue display.
+- Sequential queue processing.
+- Local logging to `logs/kopeeer.log`.
 
-It intentionally does not execute file operations yet. The production worker must be connected only after the file-operation executor is real and tested on Windows.
+It intentionally does not integrate with Explorer yet. This is the first safe local test version.
 
-### Current Context Menu Path
+### Experimental Context Menu Path
 
-The first Explorer integration path avoids COM while the product is still unverified on Windows:
+The first Explorer integration path should avoid COM while the product is still unverified on Windows:
 
 - Current-user registry verbs call the app executable.
 - The app receives `--queue-copy` or `--queue-move`.
 - The app prompts for a destination folder.
 - The queue core persists the job.
 
-This path is less powerful than a native Shell Extension, but it is reversible and safer for the first Windows laptop test.
+This path is less powerful than a native Shell Extension, but it is reversible and safer for later Windows testing. It is not part of the manual `0.1.0-alpha` test app.
 
 ### Worker
 

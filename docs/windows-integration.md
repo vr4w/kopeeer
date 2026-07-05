@@ -43,8 +43,8 @@ Why first:
 
 Current prototype:
 
-- `FileOperationQueue.App.exe --queue-copy "<path>"`
-- `FileOperationQueue.App.exe --queue-move "<path>"`
+- `Kopeeer.App.exe --queue-copy "<path>"`
+- `Kopeeer.App.exe --queue-move "<path>"`
 - `tools/windows/install-context-menu-dev.ps1`
 - `tools/windows/uninstall-context-menu-dev.ps1`
 - `installer/inno/Kopeeer.iss`

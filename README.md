@@ -30,11 +30,11 @@ It is not trying to be a faster copy engine, a clipboard manager, a file sharing
 
 ## Status
 
-Kopeeer is early-stage and experimental.
+Kopeeer is currently an early alpha prototype.
 
 It is not ready for production use.
 
-No deep Explorer integration is implemented yet. Shell integration on Windows is powerful, strict, and easy to get wrong. Version 0.1 should start with the safer path: queue core, local worker, minimal tray app, and explicit Explorer context menu integration. Modifier-based drag-and-drop remains planned research until a Windows prototype proves it can be done without breaking normal Explorer behavior.
+The current test app does not integrate with Windows Explorer yet. Shell integration on Windows is powerful, strict, and easy to get wrong, so the first runnable build is a manual local app: choose source, choose target, choose copy or move, add to queue, and process jobs sequentially.
 
 ## Planned Shape
 
@@ -58,22 +58,79 @@ See [docs/architecture.md](docs/architecture.md), [docs/architecture-decision.md
 
 ## Current Code
 
-The first code is intentionally small:
+The first local test version is intentionally small:
 
-- Neutral `FileOperationQueue.Core` namespace.
-- Queue job model and statuses.
-- JSON queue persistence.
-- Local worker boundary.
-- Windows tray UI scaffold for viewing the queue.
-- Command-line queue handoff for early Explorer context menu tests.
+- `Kopeeer.sln`
+- `src/Kopeeer.App`
+- `src/Kopeeer.Core`
+- `src/Kopeeer.Worker`
+- Manual source file/folder selection.
+- Manual target folder selection.
+- Copy/move queue.
+- Sequential processing.
+- Basic status display.
+- Basic local logging to `logs/kopeeer.log`.
 - No Shell Extension.
 - No Explorer hook.
-- No production copy engine yet.
+- No installer.
+- No context menu.
+- No automatic shortcut handling.
 
-Development target:
+## Build Requirements
 
-- .NET 8 SDK for the queue core.
-- Windows 10/11 for real file-operation and Explorer integration testing.
+- Windows 10 or Windows 11.
+- .NET 8 SDK or newer.
+- Optional: Visual Studio 2022.
+
+## How To Build
+
+```powershell
+dotnet restore
+dotnet build
+```
+
+Or:
+
+```powershell
+scripts\build.ps1
+```
+
+## How To Run
+
+```powershell
+dotnet run --project src/Kopeeer.App
+```
+
+Or:
+
+```powershell
+scripts\run.ps1
+```
+
+## What Works In 0.1.0-alpha
+
+- Manual file/folder selection.
+- Manual target folder selection.
+- Copy/move queue.
+- Sequential processing.
+- Basic status display.
+- Basic logging.
+
+## What Does Not Work Yet
+
+- No Explorer integration yet.
+- No Shell Extension yet.
+- No installer yet.
+- No context menu yet.
+- No drag-and-drop hook yet.
+- No automatic shortcut handling yet.
+
+## Known Alpha Limitations
+
+- Existing target files or folders fail the job instead of prompting.
+- Long paths and network drives are not deeply tested yet.
+- Move is implemented as copy-then-delete after a successful copy.
+- The UI is intentionally plain.
 
 See [docs/windows-test-plan.md](docs/windows-test-plan.md) before treating Windows behavior as verified.
 

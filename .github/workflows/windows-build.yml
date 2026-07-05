@@ -21,12 +21,11 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Build core
-        run: dotnet build src\FileOperationQueue.Core\FileOperationQueue.Core.csproj --configuration Release
+      - name: Restore
+        run: dotnet restore Kopeeer.sln
 
-      - name: Build app
-        run: dotnet build src\FileOperationQueue.App\FileOperationQueue.App.csproj --configuration Release
+      - name: Build solution
+        run: dotnet build Kopeeer.sln --configuration Release --no-restore
 
       - name: Validate project structure
         run: python tools\validate_project.py
-

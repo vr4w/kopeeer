@@ -18,6 +18,12 @@ The format is based on Keep a Changelog, and this project intends to follow sema
 - Draft Inno Setup installer script and reversible current-user context menu dev scripts.
 - Drag-and-drop Explorer hook prototype plan and Windows test checklist.
 - Windows build workflow for GitHub Actions.
+- First buildable Windows app skeleton for `0.1.0-alpha`.
+- Manual copy/move queue prototype.
+- Sequential job processing.
+- Safe file/folder copy and move behavior that fails instead of overwriting existing targets.
+- Basic local logging to `logs/kopeeer.log`.
+- README build/run instructions and helper scripts.
 - Windows integration notes covering Shell Extensions, context menus, drag-and-drop risk, copy hooks, and `IFileOperation`.
 - Branding note for current working display name `Kopeeer` and repository codename `file-operation-queue`.
 - English-first localization strategy for version 0.1.
@@ -30,3 +36,4 @@ The format is based on Keep a Changelog, and this project intends to follow sema
 - Shell Extension registration, unloading, crash isolation, and installer cleanup need dedicated Windows testing.
 - The tray app targets Windows and still needs verification on a Windows machine with the .NET SDK installed.
 - Context menu and drag-and-drop behavior must be verified on Windows before release.
+- Long paths and network drives are known alpha limitations.

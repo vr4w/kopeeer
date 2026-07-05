@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>Kopeeer.App</RootNamespace>
+    <AssemblyName>Kopeeer.App</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Kopeeer.Core/Kopeeer.Core.csproj" />
+    <ProjectReference Include="../Kopeeer.Worker/Kopeeer.Worker.csproj" />
+  </ItemGroup>
+</Project>
+

@@ -4,8 +4,8 @@
 #define AppName "Kopeeer"
 #define AppVersion "0.1.0"
 #define AppPublisher "file-operation-queue contributors"
-#define AppExeName "FileOperationQueue.App.exe"
-#define PublishDir "..\..\artifacts\publish\FileOperationQueue.App"
+#define AppExeName "Kopeeer.App.exe"
+#define PublishDir "..\..\artifacts\publish\Kopeeer.App"
 
 [Setup]
 AppId={{8F7F8CF9-13CE-4E1C-8E8D-FA4D54BB4A47}
@@ -47,4 +47,3 @@ Root: HKCU; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith\command";
 
 [Run]
 Filename: "{app}\{#AppExeName}"; Description: "Start {#AppName}"; Flags: nowait postinstall skipifsilent
-
