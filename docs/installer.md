@@ -4,15 +4,23 @@ The project needs an installer because deep Windows integration must be register
 
 ## Recommended Installer Direction
 
-Use WiX Toolset for the first serious Windows installer.
+Evaluate WiX Toolset and Inno Setup for the first serious Windows installer.
 
-Reasons:
+WiX strengths:
 
 - Good fit for MSI-based Windows installation.
 - Handles registry entries and component ownership explicitly.
 - Can model upgrades and uninstallation.
 - Suitable for Shell Extension registration when authored carefully.
 - More appropriate for this project than a quick archive-based release because Explorer integration must be reversible.
+
+Inno Setup strengths:
+
+- Simpler authoring model.
+- Friendly for small Windows utilities.
+- Good candidate if the first installer does not need complex MSI behavior.
+
+The final choice should be based on registration reliability, uninstall cleanliness, upgrade behavior, and how clearly the installer can explain Explorer integration.
 
 ## Installer Goals
 

@@ -2,7 +2,7 @@
 
 The project should grow in small, testable phases. Each phase should leave the tool understandable.
 
-## Phase 0: Concept And Architecture
+## Phase 0: Concept And Public Project Foundation
 
 - Define the core product boundary.
 - Compare Shell Extension and app architecture options.
@@ -11,17 +11,26 @@ The project should grow in small, testable phases. Each phase should leave the t
 - Prepare public project files.
 - Keep product naming configurable while candidates are evaluated.
 
-## Phase 1: Queue Core And Tray App
+## Phase 1: Queue Core And Local Worker
 
 - Implement a local queue model.
 - Add one active job at a time.
 - Add pause, resume, cancel, and retry decisions where technically safe.
-- Build a minimal tray app with current job and pending jobs.
+- Add local worker boundaries.
+- Evaluate `IFileOperation` and fallback strategies.
 - Store settings locally.
 - Keep file-operation guarantees conservative until real Windows tests prove them.
 - Centralize user-facing strings so the app is localization-ready.
 
-## Phase 2: Explorer Context Menu
+## Phase 2: Tray App / Minimal UI
+
+- Build a minimal tray app with current job and pending jobs.
+- Add clear status labels.
+- Add queue controls only when they are technically safe.
+- Keep UI copy English-first and centralized.
+- Avoid dashboard-style complexity.
+
+## Phase 3: Explorer Context Menu Integration
 
 - Add explicit Explorer commands:
   - "Copy with Kopeeer..."
@@ -32,23 +41,24 @@ The project should grow in small, testable phases. Each phase should leave the t
 - Validate registration and uninstallation on Windows 10 and Windows 11.
 - Treat this as the first production Explorer integration path.
 
-## Phase 3: Drag-and-drop Integration
+## Phase 4: Drag-and-drop / Shell Integration Research
 
 - Research the safest Shell mechanism for the modifier-based drop workflow.
 - Prototype modifier detection such as `ALT + SHIFT`.
 - Confirm whether the app can reliably take over a drop without breaking normal Explorer behavior.
 - Assume this belongs after 0.1 unless the prototype is exceptionally clean.
+- Do not ship a production-ready Explorer hook until stability is proven.
 
-## Phase 4: Installer And Release
+## Phase 5: Installer And Release Packaging
 
-- Create a WiX-based installer.
+- Evaluate WiX Toolset and Inno Setup.
 - Register and unregister Shell Extension components cleanly.
 - Offer installer options for Explorer integration.
 - Add release signing plan.
 - Keep the version 0.1 installer English only, with clear Explorer integration wording.
 - Build first public alpha release.
 
-## Phase 5: Polishing, Logs, Conflict Handling, Favorites
+## Phase 6: Conflict Handling, Logs, Polish, Localization
 
 - Improve conflict handling for existing files.
 - Add clear, local-only logs.

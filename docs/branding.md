@@ -20,11 +20,6 @@ Current preferred candidates:
 - Draylo
 - Drailo
 
-Other active candidates:
-
-- FileRail
-- MoveQ
-
 Branding must stay easy to rename. Code, documentation, installer text, UI strings, and issue templates should avoid assuming that `Kopeeer` is permanent.
 
 ## Naming Notes
@@ -39,13 +34,19 @@ This is not legal trademark clearance. Before public 1.0 release, perform a prop
 
 `Movuq`, `Draylo`, and `Drailo` remain active candidates. They should be evaluated for clarity, pronunciation, searchability, and whether they imply the right Windows file-operation queue.
 
-`FileRail` suggests a simple path for files: not rushed, not scattered, but guided along a track. It has a warmer product feel, but it may be slightly less immediate.
-
-`MoveQ` is short, direct, and close to the queue idea. It may understate copy operations.
-
 ## Rejected Candidates
 
+- `FileFlow`: Rejected because it is broad, generic, and likely crowded around workflow and file-transfer products.
 - `Qopy`: Rejected because existing Qopy projects/services already occupy clipboard, file sharing, and file copy-related territory.
+- `Droq`: Rejected because it is short but unclear, and it does not immediately support the calm Windows file-operation queue positioning.
+- `Firail`: Rejected because it is harder to read and pronounce cleanly.
+- `Qrail`: Rejected because the queue/rail blend feels more technical than friendly.
+- `RailQ`: Rejected because it reads more like an internal component or library than a small Windows utility.
+- `DropQ`: Rejected because it overemphasizes dropping and may imply a drop-zone app.
+- `ShiftQ`: Rejected because it overemphasizes keyboard modifiers and may imply shortcut software.
+- `MoveQ`: Rejected because it underrepresents copy operations and still feels like a working placeholder.
+- `Moviq`: Rejected because it may read as "movie" or media-adjacent.
+- `Quevo`: Rejected because it is less connected to local Windows file operations.
 - `F.Paste`: Rejected for now because "paste" is strongly associated with clipboard actions, and it may collide conceptually with pastebin, fpaste, and clipboard-related Windows tools.
 
 ## Tagline
@@ -58,11 +59,7 @@ Alternative:
 
 > A calm queue for Windows file operations.
 
-German direction:
-
-> Dateien rein. Reihenfolge drin. Ruhe.
-
-This German line is directional only. Version 0.1 documentation, UI, installer, and issue templates should be English.
+Version 0.1 documentation, UI, installer, and issue templates should be English.
 
 ## Tone
 

@@ -39,7 +39,7 @@ Recommended direction for version 0.1:
 
 The Shell Extension should never become the worker. Explorer should only load a small integration component that validates input and hands work to the app or worker.
 
-See [architecture-decision.md](architecture-decision.md) for the current decision record.
+See [architecture.md](architecture.md) for the broader architecture overview and [architecture-decision.md](architecture-decision.md) for the current decision record.
 
 ## Tech Stack Comparison
 
@@ -179,10 +179,12 @@ Proposed future structure:
   SECURITY.md
   docs/
     concept.md
+    architecture.md
     architecture-decision.md
     windows-integration.md
     shortcuts.md
     installer.md
+    localization.md
     branding.md
   src/
     FileOperationQueue.App/
