@@ -1,26 +1,37 @@
 ; Kopeeer installer draft.
-; Build this on Windows after publishing Kopeeer.App.
+; Build on Windows through scripts\build-installer.ps1.
+
+#ifndef AppVersion
+#define AppVersion "0.2.0-alpha"
+#endif
+
+#ifndef PublishDir
+#define PublishDir "..\..\artifacts\publish\Kopeeer.App"
+#endif
+
+#ifndef OutputDir
+#define OutputDir "..\..\artifacts\installer"
+#endif
 
 #define AppName "Kopeeer"
-#define AppVersion "0.1.0"
 #define AppPublisher "file-operation-queue contributors"
 #define AppExeName "Kopeeer.App.exe"
-#define PublishDir "..\..\artifacts\publish\Kopeeer.App"
 
 [Setup]
 AppId={{8F7F8CF9-13CE-4E1C-8E8D-FA4D54BB4A47}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppPublisher={#AppPublisher}
-DefaultDirName={autopf}\{#AppName}
+DefaultDirName={localappdata}\Programs\{#AppName}
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
+OutputDir={#OutputDir}
 OutputBaseFilename=Kopeeer-Setup-{#AppVersion}
 Compression=lzma
 SolidCompression=yes
 ArchitecturesAllowed=x64
-ArchitecturesInstallIn64BitMode=x64
 PrivilegesRequired=lowest
+UninstallDisplayIcon={app}\{#AppExeName}
 
 [Files]
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs

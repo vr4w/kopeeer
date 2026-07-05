@@ -26,10 +26,47 @@ The final choice should be based on registration reliability, uninstall cleanlin
 Current repository state:
 
 - `installer/inno/Kopeeer.iss` is a draft Inno Setup script.
-- It installs the app from a future publish output folder.
+- `scripts/build-installer.ps1` publishes the app and builds the installer EXE on Windows.
+- It installs the app from `artifacts\publish\Kopeeer.App`.
+- It writes the installer to `artifacts\installer`.
+- It installs into the current user's local app folder and should not require admin rights.
 - It registers current-user context menu commands for files and folders.
 - It does not install a native Shell Extension or drag-and-drop hook.
 - The current alpha context menu registration is tested first through `scripts/register-context-menu.ps1` and `scripts/unregister-context-menu.ps1`.
+
+## Build Current Alpha Installer
+
+Requirements:
+
+- Windows 10 or Windows 11.
+- .NET 8 SDK or newer.
+- Inno Setup 6.
+
+Build:
+
+```powershell
+scripts\build-installer.ps1
+```
+
+Optional custom version:
+
+```powershell
+scripts\build-installer.ps1 -Version "0.2.0-alpha"
+```
+
+Optional custom Inno Setup compiler path:
+
+```powershell
+scripts\build-installer.ps1 -InnoCompilerPath "C:\Path\To\ISCC.exe"
+```
+
+Expected output:
+
+```text
+artifacts\installer\Kopeeer-Setup-0.2.0-alpha.exe
+```
+
+This installer is still an alpha packaging test. It is useful for validating install, uninstall, and context menu behavior before deeper Windows integration is attempted.
 
 ## Installer Goals
 

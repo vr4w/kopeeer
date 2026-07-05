@@ -34,7 +34,7 @@ Kopeeer is currently an early alpha prototype.
 
 It is not ready for production use.
 
-The current test app does not integrate with Windows Explorer yet. Shell integration on Windows is powerful, strict, and easy to get wrong, so the first runnable build is a manual local app: choose source, choose target, choose copy or move, add to queue, and process jobs sequentially.
+The current test app is a local WinForms prototype with optional alpha context menu registration. It does not install a native Shell Extension, does not register COM components, and does not implement drag-and-drop interception yet.
 
 ## Planned Shape
 
@@ -70,10 +70,11 @@ The first local test version is intentionally small:
 - Sequential processing.
 - Basic status display.
 - Basic local logging to `logs/kopeeer.log`.
+- Optional alpha Explorer context menu commands for files and folders.
+- Draft Inno Setup installer builder.
 - No Shell Extension.
 - No Explorer hook.
-- No installer.
-- No context menu.
+- No production-ready installer.
 - No automatic shortcut handling.
 
 ## Build Requirements
@@ -106,6 +107,30 @@ Or:
 ```powershell
 scripts\run.ps1
 ```
+
+## How To Build An Installer EXE
+
+Installer builds are Windows-only for now.
+
+Requirements:
+
+- Windows 10 or Windows 11.
+- .NET 8 SDK or newer.
+- Inno Setup 6.
+
+Build the app and installer:
+
+```powershell
+scripts\build-installer.ps1
+```
+
+The expected output is:
+
+```text
+artifacts\installer\Kopeeer-Setup-0.2.0-alpha.exe
+```
+
+The alpha installer installs Kopeeer into the current user's local app folder and registers current-user context menu commands. It should not require admin rights. It still does not install a Shell Extension, COM component, Explorer hook, or drag-and-drop integration.
 
 ## Testing Explorer Context Menu Integration
 

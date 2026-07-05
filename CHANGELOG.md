@@ -13,6 +13,7 @@ The format is based on Keep a Changelog, and this project intends to follow sema
 - User-level register/unregister scripts for context menu testing.
 - Target picker flow for Explorer-selected files/folders.
 - More queue-focused app layout with manual job creation behind "Add job manually...".
+- Installer builder script that publishes the app and creates an Inno Setup installer EXE.
 
 ### Changed
 

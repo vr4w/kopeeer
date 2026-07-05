@@ -3,6 +3,7 @@ bin/
 obj/
 out/
 artifacts/
+.inno/
 .dotnet/
 
 # User/local files

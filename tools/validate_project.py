@@ -31,6 +31,7 @@ required_files = [
     "src/Kopeeer.Worker/FileOperationProcessor.cs",
     "src/Kopeeer.Worker/SequentialQueueProcessor.cs",
     "scripts/build.ps1",
+    "scripts/build-installer.ps1",
     "scripts/run.ps1",
     "scripts/register-context-menu.ps1",
     "scripts/unregister-context-menu.ps1",
