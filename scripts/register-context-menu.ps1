@@ -38,14 +38,24 @@ function Add-RegistryValue {
         [string]$Value
     )
 
-    if ($Name -eq "") {
-        & reg.exe add $Key /ve /t REG_SZ /d $Value /f | Out-Null
-    } else {
-        & reg.exe add $Key /v $Name /t REG_SZ /d $Value /f | Out-Null
+    if (-not $Key.StartsWith("HKCU\", [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Only HKCU registry keys are supported by this script: $Key"
     }
 
-    if ($LASTEXITCODE -ne 0) {
-        throw "Failed to write registry value '$Name' at '$Key'."
+    $subKeyPath = $Key.Substring("HKCU\".Length)
+    $registryKey = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey($subKeyPath)
+    if ($null -eq $registryKey) {
+        throw "Failed to open or create registry key: $Key"
+    }
+
+    try {
+        if ($Name -eq "") {
+            $registryKey.SetValue("", $Value, [Microsoft.Win32.RegistryValueKind]::String)
+        } else {
+            $registryKey.SetValue($Name, $Value, [Microsoft.Win32.RegistryValueKind]::String)
+        }
+    } finally {
+        $registryKey.Close()
     }
 }
 
