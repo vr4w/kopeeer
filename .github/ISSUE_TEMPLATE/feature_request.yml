@@ -1,0 +1,45 @@
+name: Feature request
+description: Suggest a small improvement or workflow.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        FileRail is intentionally small. Please describe the workflow first.
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Workflow
+      description: What are you trying to do?
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What feels noisy, slow, unclear, or repetitive today?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Suggested change
+      description: What would make this calmer?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Queue
+        - Tray app
+        - Explorer context menu
+        - Drag and drop
+        - Installer
+        - Documentation
+        - Other
+    validations:
+      required: true
+
