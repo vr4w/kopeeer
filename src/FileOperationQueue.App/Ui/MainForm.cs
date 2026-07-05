@@ -82,10 +82,11 @@ public sealed class MainForm : Form
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 44));
 
+        var baseFont = Font ?? SystemFonts.DefaultFont;
         var title = new Label
         {
             AutoSize = true,
-            Font = new Font(Font, FontStyle.Bold),
+            Font = new Font(baseFont, FontStyle.Bold),
             Text = ProductBranding.Tagline
         };
 

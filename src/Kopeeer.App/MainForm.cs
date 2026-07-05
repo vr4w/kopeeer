@@ -63,13 +63,17 @@ public sealed class MainForm : Form
         return root;
     }
 
-    private static Control BuildHeader() =>
-        new Label
+    private static Control BuildHeader()
+    {
+        var baseFont = SystemFonts.MessageBoxFont ?? SystemFonts.DefaultFont;
+
+        return new Label
         {
             AutoSize = true,
-            Font = new Font(SystemFonts.MessageBoxFont, FontStyle.Bold),
+            Font = new Font(baseFont, FontStyle.Bold),
             Text = "A calm queue for Windows file operations."
         };
+    }
 
     private Control BuildInputArea()
     {
