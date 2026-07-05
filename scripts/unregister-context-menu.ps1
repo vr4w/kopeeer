@@ -1,16 +1,18 @@
 $ErrorActionPreference = "Stop"
 
 $keys = @(
-    "HKCU:\Software\Classes\*\shell\Kopeeer.CopyWith",
-    "HKCU:\Software\Classes\*\shell\Kopeeer.MoveWith",
-    "HKCU:\Software\Classes\Directory\shell\Kopeeer.CopyWith",
-    "HKCU:\Software\Classes\Directory\shell\Kopeeer.MoveWith"
+    "HKCU\Software\Classes\*\shell\Kopeeer.CopyWith",
+    "HKCU\Software\Classes\*\shell\Kopeeer.MoveWith",
+    "HKCU\Software\Classes\Directory\shell\Kopeeer.CopyWith",
+    "HKCU\Software\Classes\Directory\shell\Kopeeer.MoveWith"
 )
 
 foreach ($key in $keys) {
-    if (Test-Path $key) {
-        Remove-Item -Path $key -Recurse -Force
+    & reg.exe delete $key /f 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) {
         Write-Host "Removed $key"
+    } else {
+        Write-Host "Not present: $key"
     }
 }
 

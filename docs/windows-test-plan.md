@@ -79,6 +79,7 @@ dotnet publish src\Kopeeer.App\Kopeeer.App.csproj -c Release -o artifacts\publis
 Install current-user context menu entries:
 
 ```powershell
+powershell -ExecutionPolicy Bypass -File scripts\unregister-context-menu.ps1
 powershell -ExecutionPolicy Bypass -File scripts\register-context-menu.ps1
 ```
 

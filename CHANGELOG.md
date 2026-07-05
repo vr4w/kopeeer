@@ -19,6 +19,10 @@ The format is based on Keep a Changelog, and this project intends to follow sema
 - Removed obsolete duplicate `FileOperationQueue.*` prototype projects from `src/` and `tests/`.
 - Updated alpha UI to make the queue list the primary surface.
 
+### Fixed
+
+- Made context menu registration use `reg.exe` with explicit default command values so Explorer can launch Kopeeer reliably.
+
 ### Known Risks
 
 - Single-instance handoff is not implemented yet; context menu launches a new app instance for now.

@@ -122,7 +122,14 @@ dotnet build src\Kopeeer.App\Kopeeer.App.csproj
 Register context menu entries:
 
 ```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\unregister-context-menu.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\register-context-menu.ps1
+```
+
+If you built to a custom location, pass the executable explicitly:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\register-context-menu.ps1 -AppExePath "C:\Path\To\Kopeeer.App.exe"
 ```
 
 Then test:
@@ -155,6 +162,7 @@ Known context menu limitations:
 - Windows 11 may show these entries under "Show more options".
 - Multi-select behavior is limited by classic verb invocation and may open one request per selected item.
 - If Kopeeer is already running, the request does not yet hand off to the existing instance.
+- If a previous script version was used, run `unregister-context-menu.ps1` once before registering again.
 
 ## Testing The Alpha App
 
