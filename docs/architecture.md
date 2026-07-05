@@ -87,7 +87,7 @@ It intentionally does not integrate with Explorer yet. This is the first safe lo
 The first Explorer integration path should avoid COM while the product is still unverified on Windows:
 
 - Current-user registry verbs call the app executable.
-- The app receives `--queue-copy` or `--queue-move`.
+- The app receives `--enqueue --operation copy|move --pick-target --sources "<path>"`.
 - The app prompts for a destination folder.
 - The queue core persists the job.
 

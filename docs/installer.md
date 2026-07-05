@@ -29,6 +29,7 @@ Current repository state:
 - It installs the app from a future publish output folder.
 - It registers current-user context menu commands for files and folders.
 - It does not install a native Shell Extension or drag-and-drop hook.
+- The current alpha context menu registration is tested first through `scripts/register-context-menu.ps1` and `scripts/unregister-context-menu.ps1`.
 
 ## Installer Goals
 

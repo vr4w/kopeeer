@@ -10,8 +10,9 @@ $keys = @(
 foreach ($key in $keys) {
     if (Test-Path $key) {
         Remove-Item -Path $key -Recurse -Force
+        Write-Host "Removed $key"
     }
 }
 
-Write-Host "Kopeeer context menu entries removed for current user."
+Write-Host "Kopeeer context menu entries removed for the current user."
 

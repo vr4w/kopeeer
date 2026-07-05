@@ -32,9 +32,9 @@ required_files = [
     "src/Kopeeer.Worker/SequentialQueueProcessor.cs",
     "scripts/build.ps1",
     "scripts/run.ps1",
+    "scripts/register-context-menu.ps1",
+    "scripts/unregister-context-menu.ps1",
     "installer/inno/Kopeeer.iss",
-    "tools/windows/install-context-menu-dev.ps1",
-    "tools/windows/uninstall-context-menu-dev.ps1",
     "docs/drag-drop-explorer-hook.md",
 ]
 
@@ -42,6 +42,8 @@ obsolete_paths = [
     "src/FileOperationQueue.App",
     "src/FileOperationQueue.Core",
     "tests/FileOperationQueue.Core.Tests",
+    "tools/windows/install-context-menu-dev.ps1",
+    "tools/windows/uninstall-context-menu-dev.ps1",
 ]
 
 present_obsolete_paths = [path for path in obsolete_paths if Path(path).exists()]

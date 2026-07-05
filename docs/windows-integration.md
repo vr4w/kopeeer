@@ -43,11 +43,22 @@ Why first:
 
 Current prototype:
 
-- `Kopeeer.App.exe --queue-copy "<path>"`
-- `Kopeeer.App.exe --queue-move "<path>"`
-- `tools/windows/install-context-menu-dev.ps1`
-- `tools/windows/uninstall-context-menu-dev.ps1`
+- `Kopeeer.App.exe --enqueue --operation copy --pick-target --sources "<path>"`
+- `Kopeeer.App.exe --enqueue --operation move --pick-target --sources "<path>"`
+- `scripts/register-context-menu.ps1`
+- `scripts/unregister-context-menu.ps1`
 - `installer/inno/Kopeeer.iss`
+
+Registry paths:
+
+- `HKCU\Software\Classes\*\shell\Kopeeer.CopyWith`
+- `HKCU\Software\Classes\*\shell\Kopeeer.MoveWith`
+- `HKCU\Software\Classes\Directory\shell\Kopeeer.CopyWith`
+- `HKCU\Software\Classes\Directory\shell\Kopeeer.MoveWith`
+
+Known limitation:
+
+- Single-instance IPC is not implemented yet. If Kopeeer is already running, a context menu request launches a new process for now.
 
 ## Drag-and-drop Integration
 

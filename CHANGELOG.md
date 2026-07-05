@@ -4,7 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project intends to follow semantic versioning once releases begin.
 
-## 0.1.0 - Unreleased
+## 0.2.0-alpha - Unreleased
+
+### Added
+
+- Command-line enqueue support with `--enqueue`, `--operation`, `--target`, `--pick-target`, and `--sources`.
+- Explorer context menu prototype using current-user registry entries.
+- User-level register/unregister scripts for context menu testing.
+- Target picker flow for Explorer-selected files/folders.
+- More queue-focused app layout with manual job creation behind "Add job manually...".
+
+### Changed
+
+- Removed obsolete duplicate `FileOperationQueue.*` prototype projects from `src/` and `tests/`.
+- Updated alpha UI to make the queue list the primary surface.
+
+### Known Risks
+
+- Single-instance handoff is not implemented yet; context menu launches a new app instance for now.
+- Windows 11 may place classic context menu entries behind "Show more options".
+- Context menu integration is an alpha prototype and does not install a Shell Extension.
+
+## 0.1.0-alpha - Unreleased
 
 ### Added
 

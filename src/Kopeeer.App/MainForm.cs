@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using Kopeeer.Core;
 using Kopeeer.Worker;
 
@@ -18,16 +19,21 @@ public sealed class MainForm : Form
     private readonly RadioButton _moveRadioButton = new();
     private readonly Button _addButton = new();
     private readonly Button _startButton = new();
+    private readonly Button _clearCompletedButton = new();
+    private readonly Button _openLogsButton = new();
+    private readonly Button _manualButton = new();
     private readonly Label _statusLabel = new();
     private readonly Label _summaryLabel = new();
     private readonly DataGridView _queueGrid = new();
+    private readonly GroupBox _manualGroup = new() { Text = "Manual test job" };
+    private readonly RowStyle _manualRowStyle = new(SizeType.Absolute, 0);
 
     public MainForm(StartupQueueRequest? startupQueueRequest = null)
     {
-        Text = "Kopeeer 0.1.0-alpha";
+        Text = "Kopeeer 0.2.0-alpha";
         StartPosition = FormStartPosition.CenterScreen;
-        MinimumSize = new Size(1040, 660);
-        Size = new Size(1180, 760);
+        MinimumSize = new Size(900, 540);
+        Size = new Size(1080, 660);
 
         _logger = new FileJobLogger(Path.Combine(Directory.GetCurrentDirectory(), "logs", "kopeeer.log"));
         _queueProcessor = new SequentialQueueProcessor(_queue, new FileOperationProcessor(), _logger);
@@ -38,9 +44,10 @@ public sealed class MainForm : Form
         Controls.Add(BuildLayout());
         ConfigureGrid();
         WireValidationEvents();
-        ApplyStartupRequest(startupQueueRequest);
         RefreshActions();
         UpdateStatus($"Ready. Log: {_logger.LogFilePath}");
+
+        Shown += async (_, _) => await ApplyStartupRequestAsync(startupQueueRequest);
     }
 
     private Control BuildLayout()
@@ -49,19 +56,21 @@ public sealed class MainForm : Form
         {
             Dock = DockStyle.Fill,
             ColumnCount = 1,
-            RowCount = 4,
+            RowCount = 5,
             Padding = new Padding(14)
         };
 
-        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
-        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 190));
+        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 62));
+        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 46));
+        root.RowStyles.Add(_manualRowStyle);
         root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         root.RowStyles.Add(new RowStyle(SizeType.Absolute, 42));
 
         root.Controls.Add(BuildHeader(), 0, 0);
-        root.Controls.Add(BuildInputArea(), 0, 1);
-        root.Controls.Add(BuildQueueArea(), 0, 2);
-        root.Controls.Add(BuildStatusBar(), 0, 3);
+        root.Controls.Add(BuildActions(), 0, 1);
+        root.Controls.Add(BuildManualInputArea(), 0, 2);
+        root.Controls.Add(BuildQueueArea(), 0, 3);
+        root.Controls.Add(BuildStatusBar(), 0, 4);
 
         return root;
     }
@@ -69,23 +78,70 @@ public sealed class MainForm : Form
     private static Control BuildHeader()
     {
         var baseFont = SystemFonts.MessageBoxFont ?? SystemFonts.DefaultFont;
+        var titleFont = new Font(baseFont.FontFamily, 16, FontStyle.Bold);
 
-        return new Label
+        var panel = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
-            Font = new Font(baseFont, FontStyle.Bold),
+            ColumnCount = 1,
+            RowCount = 2
+        };
+
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 32));
+        panel.RowStyles.Add(new RowStyle(SizeType.Absolute, 24));
+        panel.Controls.Add(new Label
+        {
+            Dock = DockStyle.Fill,
+            Font = titleFont,
+            Text = "Kopeeer",
+            TextAlign = ContentAlignment.MiddleLeft
+        }, 0, 0);
+        panel.Controls.Add(new Label
+        {
+            Dock = DockStyle.Fill,
             Text = "A calm queue for Windows file operations.",
             TextAlign = ContentAlignment.MiddleLeft
-        };
+        }, 0, 1);
+
+        return panel;
     }
 
-    private Control BuildInputArea()
+    private Control BuildActions()
     {
-        var group = new GroupBox
+        var panel = new FlowLayoutPanel
         {
             Dock = DockStyle.Fill,
-            Text = "Create queue job"
+            FlowDirection = FlowDirection.LeftToRight,
+            WrapContents = false
         };
+
+        _startButton.Text = "Start queue";
+        _clearCompletedButton.Text = "Clear completed";
+        _openLogsButton.Text = "Open logs";
+        _manualButton.Text = "Add job manually...";
+
+        _startButton.AutoSize = true;
+        _clearCompletedButton.AutoSize = true;
+        _openLogsButton.AutoSize = true;
+        _manualButton.AutoSize = true;
+
+        _startButton.Click += async (_, _) => await StartQueueAsync();
+        _clearCompletedButton.Click += (_, _) => ClearCompleted();
+        _openLogsButton.Click += (_, _) => OpenLogs();
+        _manualButton.Click += (_, _) => ToggleManualPanel();
+
+        panel.Controls.Add(_startButton);
+        panel.Controls.Add(_clearCompletedButton);
+        panel.Controls.Add(_openLogsButton);
+        panel.Controls.Add(_manualButton);
+
+        return panel;
+    }
+
+    private Control BuildManualInputArea()
+    {
+        _manualGroup.Dock = DockStyle.Fill;
+        _manualGroup.Visible = false;
 
         var layout = new TableLayoutPanel
         {
@@ -122,30 +178,23 @@ public sealed class MainForm : Form
         _moveRadioButton.Text = "Move";
 
         _addButton.Text = "Add to queue";
-        _startButton.Text = "Start queue";
         _addButton.Dock = DockStyle.Fill;
-        _startButton.Dock = DockStyle.Fill;
-        _addButton.Click += (_, _) => AddJob();
-        _startButton.Click += async (_, _) => await StartQueueAsync();
+        _addButton.Click += (_, _) => AddManualJob();
 
         layout.Controls.Add(MakeInputLabel("Source"), 0, 0);
         layout.Controls.Add(_sourceTextBox, 1, 0);
         layout.Controls.Add(sourceFileButton, 2, 0);
         layout.Controls.Add(sourceFolderButton, 3, 0);
-
         layout.Controls.Add(MakeInputLabel("Target"), 0, 1);
         layout.Controls.Add(_targetTextBox, 1, 1);
         layout.Controls.Add(targetButton, 2, 1);
-
         layout.Controls.Add(MakeInputLabel("Operation"), 0, 2);
         layout.Controls.Add(_copyRadioButton, 1, 2);
         layout.Controls.Add(_moveRadioButton, 2, 2);
+        layout.Controls.Add(_addButton, 3, 3);
 
-        layout.Controls.Add(_addButton, 2, 3);
-        layout.Controls.Add(_startButton, 3, 3);
-
-        group.Controls.Add(layout);
-        return group;
+        _manualGroup.Controls.Add(layout);
+        return _manualGroup;
     }
 
     private Control BuildQueueArea()
@@ -209,18 +258,25 @@ public sealed class MainForm : Form
 
         _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Operation", DataPropertyName = nameof(QueueJob.OperationType), Width = 90 });
         _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Status", DataPropertyName = nameof(QueueJob.Status), Width = 90 });
-        _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Source", DataPropertyName = nameof(QueueJob.SourcePath), AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 34 });
-        _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Target", DataPropertyName = nameof(QueueJob.TargetFolder), AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 26 });
+        _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Source", DataPropertyName = nameof(QueueJob.SourcePath), AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 38 });
+        _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Target", DataPropertyName = nameof(QueueJob.TargetFolder), AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 28 });
         _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Created", DataPropertyName = nameof(QueueJob.CreatedAt), Width = 145 });
         _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Started", DataPropertyName = nameof(QueueJob.StartedAt), Width = 145 });
         _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Completed", DataPropertyName = nameof(QueueJob.CompletedAt), Width = 145 });
-        _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Error", DataPropertyName = nameof(QueueJob.ErrorMessage), AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 20 });
+        _queueGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Error", DataPropertyName = nameof(QueueJob.ErrorMessage), AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill, FillWeight = 24 });
     }
 
     private void WireValidationEvents()
     {
         _sourceTextBox.TextChanged += (_, _) => RefreshActions();
         _targetTextBox.TextChanged += (_, _) => RefreshActions();
+    }
+
+    private void ToggleManualPanel()
+    {
+        _manualGroup.Visible = !_manualGroup.Visible;
+        _manualRowStyle.Height = _manualGroup.Visible ? 190 : 0;
+        _manualButton.Text = _manualGroup.Visible ? "Hide manual add" : "Add job manually...";
     }
 
     private void SelectSourceFile()
@@ -266,16 +322,27 @@ public sealed class MainForm : Form
         }
     }
 
-    private void AddJob()
+    private void AddManualJob()
+    {
+        var operationType = _copyRadioButton.Checked ? FileOperationType.Copy : FileOperationType.Move;
+        AddJobs(operationType, [_sourceTextBox.Text], _targetTextBox.Text);
+    }
+
+    private void AddJobs(FileOperationType operationType, IEnumerable<string> sourcePaths, string targetFolder)
     {
         try
         {
-            var operationType = _copyRadioButton.Checked ? FileOperationType.Copy : FileOperationType.Move;
-            var addedJob = _queue.Add(_sourceTextBox.Text, _targetTextBox.Text, operationType);
-            _jobs.Add(addedJob);
-            _logger.JobAdded(addedJob);
+            var added = 0;
+            foreach (var sourcePath in sourcePaths)
+            {
+                var addedJob = _queue.Add(sourcePath, targetFolder, operationType);
+                _jobs.Add(addedJob);
+                _logger.JobAdded(addedJob);
+                added++;
+            }
+
             RefreshQueueGrid();
-            UpdateStatus($"Added {operationType} job. {_jobs.Count(queueJob => queueJob.Status == JobStatus.Pending)} pending.");
+            UpdateStatus($"Added {added} {operationType} job(s). {_jobs.Count(queueJob => queueJob.Status == JobStatus.Pending)} pending.");
         }
         catch (Exception exception)
         {
@@ -302,6 +369,32 @@ public sealed class MainForm : Form
         }
     }
 
+    private void ClearCompleted()
+    {
+        foreach (var job in _jobs.Where(job => job.Status == JobStatus.Completed).ToArray())
+        {
+            _jobs.Remove(job);
+        }
+
+        RefreshQueueGrid();
+        UpdateStatus("Completed jobs cleared.");
+    }
+
+    private void OpenLogs()
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(_logger.LogFilePath) ?? ".");
+        if (!File.Exists(_logger.LogFilePath))
+        {
+            File.WriteAllText(_logger.LogFilePath, string.Empty);
+        }
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = _logger.LogFilePath,
+            UseShellExecute = true
+        });
+    }
+
     private void RefreshQueueGrid()
     {
         if (InvokeRequired)
@@ -319,10 +412,12 @@ public sealed class MainForm : Form
         var hasSource = File.Exists(_sourceTextBox.Text) || Directory.Exists(_sourceTextBox.Text);
         var hasTarget = Directory.Exists(_targetTextBox.Text);
         var hasPending = _jobs.Any(job => job.Status == JobStatus.Pending);
+        var hasCompleted = _jobs.Any(job => job.Status == JobStatus.Completed);
         var isRunning = _queueProcessor.IsRunning;
 
         _addButton.Enabled = hasSource && hasTarget && !isRunning;
         _startButton.Enabled = hasPending && !isRunning;
+        _clearCompletedButton.Enabled = hasCompleted && !isRunning;
         _summaryLabel.Text = BuildSummary();
     }
 
@@ -354,16 +449,39 @@ public sealed class MainForm : Form
         _summaryLabel.Text = BuildSummary();
     }
 
-    private void ApplyStartupRequest(StartupQueueRequest? request)
+    private async Task ApplyStartupRequestAsync(StartupQueueRequest? request)
     {
         if (request is null)
         {
             return;
         }
 
-        _sourceTextBox.Text = request.SourcePath;
-        _copyRadioButton.Checked = request.OperationType == FileOperationType.Copy;
-        _moveRadioButton.Checked = request.OperationType == FileOperationType.Move;
-        UpdateStatus("Source loaded from command line. Select a target folder and add the job.");
+        var targetFolder = request.TargetFolder;
+        if (request.PickTarget)
+        {
+            using var dialog = new FolderBrowserDialog
+            {
+                Description = "Select target folder",
+                UseDescriptionForTitle = true
+            };
+
+            if (dialog.ShowDialog(this) != DialogResult.OK)
+            {
+                UpdateStatus("Context menu request canceled.");
+                return;
+            }
+
+            targetFolder = dialog.SelectedPath;
+        }
+
+        if (string.IsNullOrWhiteSpace(targetFolder))
+        {
+            UpdateStatus("No target folder selected.");
+            return;
+        }
+
+        AddJobs(request.OperationType, request.SourcePaths, targetFolder);
+        Activate();
+        await Task.CompletedTask;
     }
 }

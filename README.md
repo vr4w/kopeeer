@@ -107,6 +107,55 @@ Or:
 scripts\run.ps1
 ```
 
+## Testing Explorer Context Menu Integration
+
+This is an alpha integration prototype.
+
+It uses current-user registry entries under `HKCU`, does not require admin rights, does not install a Shell Extension, does not register COM components, and does not support `ALT + SHIFT` drag-and-drop yet.
+
+Build first:
+
+```powershell
+dotnet build src\Kopeeer.App\Kopeeer.App.csproj
+```
+
+Register context menu entries:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\register-context-menu.ps1
+```
+
+Then test:
+
+- Right-click a file in Windows Explorer.
+- Choose `Copy with Kopeeer...`.
+- Pick a target folder.
+- Confirm the job appears in Kopeeer.
+- Start the queue.
+- Repeat with `Move with Kopeeer...`.
+- Repeat with a folder.
+
+Remove the context menu entries:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\unregister-context-menu.ps1
+```
+
+Registry paths used:
+
+```text
+HKCU\Software\Classes\*\shell\Kopeeer.CopyWith
+HKCU\Software\Classes\*\shell\Kopeeer.MoveWith
+HKCU\Software\Classes\Directory\shell\Kopeeer.CopyWith
+HKCU\Software\Classes\Directory\shell\Kopeeer.MoveWith
+```
+
+Known context menu limitations:
+
+- Windows 11 may show these entries under "Show more options".
+- Multi-select behavior is limited by classic verb invocation and may open one request per selected item.
+- If Kopeeer is already running, the request does not yet hand off to the existing instance.
+
 ## Testing The Alpha App
 
 Use throwaway files first. Do not test with important production data.
