@@ -82,6 +82,12 @@ Expected installer output:
 artifacts\installer\Kopeeer-Setup-0.2.0-alpha.exe
 ```
 
+## CI
+
+GitHub Actions currently runs a simple Windows build for `src\Kopeeer.App\Kopeeer.App.csproj`. That project references the intended `Kopeeer.Core` and `Kopeeer.Worker` projects.
+
+The workflow does not build the installer during early alpha. GitHub may show platform warnings for action runtime versions; those warnings are separate from the Kopeeer build unless the workflow step fails.
+
 ## Test Safely
 
 Create a throwaway test area:

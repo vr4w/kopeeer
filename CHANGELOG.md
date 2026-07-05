@@ -30,6 +30,7 @@ The format is based on Keep a Changelog, and this project intends to follow sema
 ### Fixed
 
 - Made context menu registration use `reg.exe` with explicit default command values so Explorer can launch Kopeeer reliably.
+- Simplified GitHub Actions to build only the intended Kopeeer app project during alpha.
 
 ### Known Risks
 

@@ -5,8 +5,6 @@ on:
   push:
     branches:
       - main
-    tags:
-      - "v*"
   pull_request:
     branches:
       - main
@@ -24,40 +22,8 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore
-        run: dotnet restore Kopeeer.sln
+      - name: Restore Kopeeer app
+        run: dotnet restore src\Kopeeer.App\Kopeeer.App.csproj
 
-      - name: Build solution
-        run: dotnet build Kopeeer.sln --configuration Release --no-restore
-
-      - name: Validate project structure
-        run: python tools\validate_project.py
-
-      - name: Install Inno Setup
-        if: github.event_name != 'pull_request'
-        run: choco install innosetup --no-progress -y
-
-      - name: Build installer
-        if: github.event_name != 'pull_request'
-        shell: pwsh
-        run: |
-          $version = "0.2.0-alpha"
-          if ("${{ github.ref_type }}" -eq "tag") {
-            $version = "${{ github.ref_name }}".TrimStart("v")
-          }
-          .\scripts\build-installer.ps1 -Version $version
-
-      - name: Upload installer artifact
-        if: github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v4
-        with:
-          name: Kopeeer-Setup
-          path: artifacts\installer\Kopeeer-Setup-*.exe
-
-      - name: Publish GitHub release
-        if: github.ref_type == 'tag'
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "${{ github.ref_name }}" artifacts\installer\Kopeeer-Setup-*.exe --title "${{ github.ref_name }}" --notes "Kopeeer alpha installer." --prerelease
+      - name: Build Kopeeer app
+        run: dotnet build src\Kopeeer.App\Kopeeer.App.csproj --configuration Release --no-restore
