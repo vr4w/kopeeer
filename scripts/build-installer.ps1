@@ -1,7 +1,7 @@
 param(
     [string]$Configuration = "Release",
     [string]$Runtime = "win-x64",
-    [string]$Version = "0.2.0-alpha",
+    [string]$Version = "0.3.0-alpha",
     [bool]$SelfContained = $true,
     [string]$InnoCompilerPath
 )
@@ -10,8 +10,10 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $projectPath = Join-Path $repoRoot "src\Kopeeer.App\Kopeeer.App.csproj"
+$dropHandlerProjectPath = Join-Path $repoRoot "native\Kopeeer.ShellExtension\Kopeeer.ShellExtension.vcxproj"
 $publishDir = Join-Path $repoRoot "artifacts\publish\Kopeeer.App"
 $installerDir = Join-Path $repoRoot "artifacts\installer"
+$dropHandlerDir = Join-Path $repoRoot "artifacts\publish\Kopeeer.Shell"
 $innoScript = Join-Path $repoRoot "installer\inno\Kopeeer.iss"
 $selfContainedValue = $SelfContained.ToString().ToLowerInvariant()
 
@@ -32,6 +34,7 @@ function Find-InnoCompiler {
     }
 
     $candidates = @(
+        "${env:LOCALAPPDATA}\Programs\Inno Setup 6\ISCC.exe",
         "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
         "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
     )
@@ -43,6 +46,28 @@ function Find-InnoCompiler {
     }
 
     return $null
+}
+
+function Find-MSBuild {
+    $pathCommand = Get-Command "MSBuild.exe" -ErrorAction SilentlyContinue
+    if ($pathCommand) {
+        return $pathCommand.Source
+    }
+
+    $candidates = @(
+        "C:\BuildTools\MSBuild\Current\Bin\amd64\MSBuild.exe",
+        "C:\BuildTools\MSBuild\Current\Bin\MSBuild.exe",
+        "${env:ProgramFiles}\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\amd64\MSBuild.exe",
+        "${env:ProgramFiles}\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\amd64\MSBuild.exe"
+    )
+
+    foreach ($candidate in $candidates) {
+        if (Test-Path -LiteralPath $candidate) {
+            return $candidate
+        }
+    }
+
+    throw "MSBuild.exe was not found. Install Visual Studio Build Tools with the C++ workload."
 }
 
 $innoCompiler = Find-InnoCompiler $InnoCompilerPath
@@ -60,6 +85,7 @@ scripts\build-installer.ps1 -InnoCompilerPath "C:\Path\To\ISCC.exe"
 
 New-Item -ItemType Directory -Force -Path $publishDir | Out-Null
 New-Item -ItemType Directory -Force -Path $installerDir | Out-Null
+New-Item -ItemType Directory -Force -Path $dropHandlerDir | Out-Null
 
 Write-Host "Publishing Kopeeer.App..."
 dotnet publish $projectPath `
@@ -68,10 +94,24 @@ dotnet publish $projectPath `
     --self-contained $selfContainedValue `
     --output $publishDir
 
+Write-Host "Building Kopeeer shell extension..."
+$msbuild = Find-MSBuild
+& $msbuild $dropHandlerProjectPath `
+    /m `
+    /p:Configuration=$Configuration `
+    /p:Platform=x64 `
+    /p:OutDir="$dropHandlerDir\\" `
+    /p:IntDir="$repoRoot\native\Kopeeer.ShellExtension\obj\x64\$Configuration\\"
+
+if ($LASTEXITCODE -ne 0) {
+    throw "MSBuild failed with exit code $LASTEXITCODE."
+}
+
 Write-Host "Building installer with Inno Setup..."
 & $innoCompiler `
     "/DAppVersion=$Version" `
     "/DPublishDir=$publishDir" `
+    "/DDropHandlerDir=$dropHandlerDir" `
     "/DOutputDir=$installerDir" `
     $innoScript
 

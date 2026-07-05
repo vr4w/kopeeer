@@ -4,10 +4,15 @@ namespace Kopeeer.Worker;
 
 public sealed class FileOperationProcessor
 {
-    public Task ProcessAsync(QueueJob job, CancellationToken cancellationToken = default) =>
-        Task.Run(() => Process(job), cancellationToken);
+    private const int BufferSize = 1024 * 1024;
 
-    private static void Process(QueueJob job)
+    public Task ProcessAsync(
+        QueueJob job,
+        Action<QueueJob>? onProgress = null,
+        CancellationToken cancellationToken = default) =>
+        Task.Run(() => Process(job, onProgress, cancellationToken), cancellationToken);
+
+    private static void Process(QueueJob job, Action<QueueJob>? onProgress, CancellationToken cancellationToken)
     {
         if (!File.Exists(job.SourcePath) && !Directory.Exists(job.SourcePath))
         {
@@ -21,20 +26,24 @@ public sealed class FileOperationProcessor
 
         if (File.Exists(job.SourcePath))
         {
-            ProcessFile(job);
+            job.TotalBytes = new FileInfo(job.SourcePath).Length;
+            job.TransferredBytes = 0;
+            ProcessFile(job, onProgress, cancellationToken);
             return;
         }
 
-        ProcessDirectory(job);
+        job.TotalBytes = GetDirectorySize(job.SourcePath);
+        job.TransferredBytes = 0;
+        ProcessDirectory(job, onProgress, cancellationToken);
     }
 
-    private static void ProcessFile(QueueJob job)
+    private static void ProcessFile(QueueJob job, Action<QueueJob>? onProgress, CancellationToken cancellationToken)
     {
         var fileName = Path.GetFileName(job.SourcePath);
         var targetPath = Path.Combine(job.TargetFolder, fileName);
         EnsureTargetDoesNotExist(targetPath);
 
-        File.Copy(job.SourcePath, targetPath, overwrite: false);
+        CopyFileWithProgress(job.SourcePath, targetPath, job, onProgress, cancellationToken);
 
         if (job.OperationType == FileOperationType.Move)
         {
@@ -42,7 +51,7 @@ public sealed class FileOperationProcessor
         }
     }
 
-    private static void ProcessDirectory(QueueJob job)
+    private static void ProcessDirectory(QueueJob job, Action<QueueJob>? onProgress, CancellationToken cancellationToken)
     {
         var directoryName = Path.GetFileName(
             job.SourcePath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
@@ -50,7 +59,7 @@ public sealed class FileOperationProcessor
         EnsureTargetDoesNotExist(targetPath);
         EnsureDirectoryTargetIsNotInsideSource(job.SourcePath, targetPath);
 
-        CopyDirectory(job.SourcePath, targetPath);
+        CopyDirectory(job.SourcePath, targetPath, job, onProgress, cancellationToken);
 
         if (job.OperationType == FileOperationType.Move)
         {
@@ -58,21 +67,77 @@ public sealed class FileOperationProcessor
         }
     }
 
-    private static void CopyDirectory(string sourceDirectory, string targetDirectory)
+    private static void CopyDirectory(
+        string sourceDirectory,
+        string targetDirectory,
+        QueueJob job,
+        Action<QueueJob>? onProgress,
+        CancellationToken cancellationToken)
     {
         Directory.CreateDirectory(targetDirectory);
 
         foreach (var file in Directory.EnumerateFiles(sourceDirectory))
         {
             var targetFile = Path.Combine(targetDirectory, Path.GetFileName(file));
-            File.Copy(file, targetFile, overwrite: false);
+            CopyFileWithProgress(file, targetFile, job, onProgress, cancellationToken);
         }
 
         foreach (var directory in Directory.EnumerateDirectories(sourceDirectory))
         {
             var targetSubdirectory = Path.Combine(targetDirectory, Path.GetFileName(directory));
-            CopyDirectory(directory, targetSubdirectory);
+            CopyDirectory(directory, targetSubdirectory, job, onProgress, cancellationToken);
         }
+    }
+
+    private static void CopyFileWithProgress(
+        string sourceFile,
+        string targetFile,
+        QueueJob job,
+        Action<QueueJob>? onProgress,
+        CancellationToken cancellationToken)
+    {
+        job.CurrentItem = Path.GetFileName(sourceFile);
+        onProgress?.Invoke(job);
+
+        using var source = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize);
+        using var target = new FileStream(targetFile, FileMode.CreateNew, FileAccess.Write, FileShare.None, BufferSize);
+        var buffer = new byte[BufferSize];
+        var started = DateTimeOffset.Now;
+        var lastProgress = DateTimeOffset.MinValue;
+
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var read = source.Read(buffer, 0, buffer.Length);
+            if (read == 0)
+            {
+                break;
+            }
+
+            target.Write(buffer, 0, read);
+            job.TransferredBytes += read;
+            var elapsed = Math.Max((DateTimeOffset.Now - started).TotalSeconds, 0.001);
+            job.BytesPerSecond = job.TransferredBytes / elapsed;
+
+            if ((DateTimeOffset.Now - lastProgress).TotalMilliseconds >= 120)
+            {
+                lastProgress = DateTimeOffset.Now;
+                onProgress?.Invoke(job);
+            }
+        }
+
+        onProgress?.Invoke(job);
+    }
+
+    private static long GetDirectorySize(string directory)
+    {
+        long total = 0;
+        foreach (var file in Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories))
+        {
+            total += new FileInfo(file).Length;
+        }
+
+        return total;
     }
 
     private static void EnsureTargetDoesNotExist(string targetPath)

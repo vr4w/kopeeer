@@ -1,96 +1,59 @@
 # Kopeeer
 
-A calm copy and move queue for Windows Explorer.
+Kopeeer is a small Windows transfer queue for Explorer.
 
-Kopeeer is an early alpha Windows utility for people who want file operations to wait their turn. Add a copy or move job from Explorer, choose the target folder, and Kopeeer processes the queue one job at a time.
+It lets you right-drag files or folders onto a destination folder, choose `Copy with Kopeeer` or `Move with Kopeeer`, and then processes the jobs one after another in a compact transfer window.
 
-Status: `0.2.0-alpha`. Use test files first. Kopeeer is not ready for production data yet.
+Status: `0.3.0-alpha`. Use test files first.
 
-No cloud sync. No telemetry. No ads.
+## What Works
+
+- Right-drag Explorer menu:
+  - `Copy with Kopeeer`
+  - `Move with Kopeeer`
+- Classic right-click context menu commands for files and folders.
+- Sequential copy/move queue.
+- Compact transfer window with:
+  - current file name
+  - overall progress bar
+  - transfer speed
+  - upcoming job list
+  - copy/move status per job
+- Windows dark-mode aware UI.
+- Optional `Shut down when done`.
+- Existing target files/folders are not overwritten silently.
+- Self-contained Windows build; no separate .NET runtime is required for the installed app.
 
 ## Install
 
-1. Open the latest GitHub Release.
-2. Download `Kopeeer-Setup-*.exe`.
-3. Run the installer.
-4. Keep `Add Explorer context menu commands` enabled.
-5. Right-click a file or folder in Explorer.
-6. Choose `Copy with Kopeeer...` or `Move with Kopeeer...`.
-7. Pick the target folder.
-
-Kopeeer opens, adds the job to the queue, and starts processing pending jobs sequentially.
-
-## Current Alpha Behavior
-
-What works now:
-
-- Current-user installer without admin rights.
-- Explorer context menu entries for files and folders.
-- Copy and move jobs.
-- Target folder picker.
-- Sequential queue processing.
-- Safe conflict behavior: existing targets are not overwritten silently.
-- Basic log file at `logs\kopeeer.log`.
-- Single running Kopeeer window for Explorer enqueue requests.
-
-What is still not finished:
-
-- No production-ready Shell Extension yet.
-- No COM registration yet.
-- No automatic drag-and-drop interception yet.
-- No `SHIFT`/modifier drop workflow yet.
-- No signed public installer yet.
-
-## Intended Workflow
-
-The product goal is still the original one: Explorer-first file operations without a complex transfer manager.
-
-The finished version should let a user copy or move files from Explorer into a calm queue with as little UI as possible. The context menu flow is the current safe alpha step. The deeper drag-and-drop workflow needs a native Explorer integration spike before it can be shipped responsibly.
-
-Kopeeer is not trying to become TeraCopy, a clipboard manager, a file sharing app, cloud sync, backup software, or a file manager.
-
-## Build From Source
-
-Requirements:
-
-- Windows 10 or Windows 11.
-- .NET 8 SDK or newer.
-- Inno Setup 6 for installer builds.
-
-Build:
-
-```powershell
-dotnet restore
-dotnet build
-```
-
-Run:
-
-```powershell
-dotnet run --project src\Kopeeer.App\Kopeeer.App.csproj
-```
-
-Build installer:
-
-```powershell
-scripts\build-installer.ps1
-```
-
-Expected installer output:
+Download and run:
 
 ```text
-artifacts\installer\Kopeeer-Setup-0.2.0-alpha.exe
+Kopeeer-Setup-0.3.0-alpha.exe
 ```
 
-## CI
+Keep `Add Explorer context menu commands` enabled.
 
-GitHub Actions currently runs a simple Windows build for `src\Kopeeer.App\Kopeeer.App.csproj`. That project references the intended `Kopeeer.Core` and `Kopeeer.Worker` projects.
+The installer needs administrator approval because Windows Explorer only loaded the right-drag shell extension reliably when it was registered machine-wide.
 
-The workflow does not build the installer during early alpha. GitHub may show platform warnings for action runtime versions; those warnings are separate from the Kopeeer build unless the workflow step fails.
+## Use
+
+Preferred workflow:
+
+1. In Explorer, drag one or more files/folders with the right mouse button.
+2. Drop them onto a target folder.
+3. Choose `Copy with Kopeeer` or `Move with Kopeeer`.
+4. Watch progress in the small Kopeeer transfer window.
+
+Fallback workflow:
+
+1. Right-click a file or folder.
+2. Choose `Copy with Kopeeer...` or `Move with Kopeeer...`.
+3. Pick a destination folder.
 
 ## Test Safely
 
-Create a throwaway test area:
+Use throwaway files first:
 
 ```powershell
 mkdir C:\Temp\KopeeerTest
@@ -99,30 +62,47 @@ mkdir C:\Temp\KopeeerTest\Target
 "hello" | Set-Content C:\Temp\KopeeerTest\Source\example.txt
 ```
 
-Then use Explorer:
+Then right-drag `example.txt` onto `Target` and choose `Copy with Kopeeer`.
 
-1. Right-click `C:\Temp\KopeeerTest\Source\example.txt`.
-2. Choose `Copy with Kopeeer...`.
-3. Pick `C:\Temp\KopeeerTest\Target`.
-4. Confirm the file appears in the target folder.
-5. Repeat the same job to confirm conflict handling fails safely.
+## Build From Source
+
+Requirements:
+
+- Windows 10 or Windows 11, 64-bit.
+- .NET 8 SDK or newer.
+- Visual Studio Build Tools with the C++ desktop workload.
+- Inno Setup 6.
+
+Build:
+
+```powershell
+dotnet build
+```
+
+Build installer:
+
+```powershell
+scripts\build-installer.ps1
+```
+
+Expected output:
+
+```text
+artifacts\installer\Kopeeer-Setup-0.3.0-alpha.exe
+```
 
 ## Repository Shape
 
-- `src/Kopeeer.App` - Windows desktop app.
+- `src/Kopeeer.App` - Windows transfer window.
 - `src/Kopeeer.Core` - queue model.
-- `src/Kopeeer.Worker` - sequential file operation worker.
-- `installer/inno` - alpha installer definition.
-- `scripts` - local build, run, installer, and context menu helper scripts.
-- `docs` - architecture, Windows integration, branding, installer, and localization notes.
+- `src/Kopeeer.Worker` - sequential copy/move worker.
+- `native/Kopeeer.ShellExtension` - native Explorer right-drag shell extension.
+- `installer/inno` - Inno Setup installer.
+- `scripts` - build, registration, and test helpers.
+- `docs` - architecture and Windows integration notes.
 
-## Project Notes
+## Notes
 
-The repository codename is `file-operation-queue`. The current working product name is `Kopeeer`, but branding should remain easy to rename until the public name is legally cleared.
+Kopeeer is intentionally small. It is not a file manager, cloud sync tool, backup app, clipboard manager, or TeraCopy clone.
 
-See:
-
-- [docs/architecture.md](docs/architecture.md)
-- [docs/architecture-decision.md](docs/architecture-decision.md)
-- [docs/windows-integration.md](docs/windows-integration.md)
-- [docs/drag-drop-explorer-hook.md](docs/drag-drop-explorer-hook.md)
+The current Explorer integration is based on a native shell extension. Early experiments showed that left-drag modifier interception was not reliable on the tested Windows 11 Explorer path, while right-drag menu integration worked.

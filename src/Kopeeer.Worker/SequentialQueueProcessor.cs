@@ -11,6 +11,7 @@ public sealed class SequentialQueueProcessor(
 
     public async Task ProcessAllAsync(
         Action? onJobChanged = null,
+        Action<QueueJob>? onJobProgress = null,
         CancellationToken cancellationToken = default)
     {
         if (IsRunning)
@@ -40,8 +41,11 @@ public sealed class SequentialQueueProcessor(
 
                 try
                 {
-                    await processor.ProcessAsync(job, cancellationToken);
+                    await processor.ProcessAsync(job, onJobProgress, cancellationToken);
                     job.Status = JobStatus.Completed;
+                    job.TransferredBytes = job.TotalBytes;
+                    job.BytesPerSecond = 0;
+                    job.CurrentItem = string.Empty;
                     job.CompletedAt = DateTimeOffset.Now;
                     logger.JobCompleted(job);
                 }
