@@ -16,6 +16,12 @@ Version 0.1 should use a mixed Windows-native architecture:
 
 The Shell Extension must stay thin. It should gather Explorer selection context, validate input, and hand work to the app or worker. It should not perform copy or move operations itself.
 
+## Development Baseline
+
+- .NET 8 for the queue core, local worker boundary, and future tray app.
+- Windows 10/11 64-bit for Explorer integration and installer validation.
+- No production Shell Extension code until the queue core and UI boundary are stable.
+
 ## Components
 
 ### Shell Extension
@@ -56,6 +62,14 @@ Purpose:
 - Keep internal state language-neutral.
 - Provide a stable contract between UI and worker.
 
+Current implementation:
+
+- `FileOperationQueue.Core` contains the first queue model and local worker boundary.
+- `OperationQueue` owns enqueue and status transitions.
+- `JsonFileQueueStore` persists queue snapshots locally.
+- `LocalQueueWorker` processes a single active job through an executor abstraction.
+- No Shell Extension or Explorer code is included.
+
 ### Worker
 
 Purpose:
@@ -70,6 +84,12 @@ Preferred direction:
 - .NET worker first.
 - Hide actual file-operation implementation behind an interface.
 - Evaluate a native worker only if Windows API behavior makes it necessary.
+
+Current implementation:
+
+- `IFileOperationExecutor` defines the execution boundary.
+- `NoOpFileOperationExecutor` exists only as a safe smoke-test executor.
+- Production copy/move behavior is not implemented yet.
 
 ### File Operation Layer
 

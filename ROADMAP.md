@@ -22,6 +22,11 @@ The project should grow in small, testable phases. Each phase should leave the t
 - Keep file-operation guarantees conservative until real Windows tests prove them.
 - Centralize user-facing strings so the app is localization-ready.
 
+Current status:
+
+- First queue model, JSON persistence, and local worker boundary are in place.
+- Production file-copy execution is still intentionally deferred.
+
 ## Phase 2: Tray App / Minimal UI
 
 - Build a minimal tray app with current job and pending jobs.

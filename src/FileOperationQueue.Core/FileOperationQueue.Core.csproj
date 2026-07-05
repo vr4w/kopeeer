@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>FileOperationQueue.Core</RootNamespace>
+    <AssemblyName>FileOperationQueue.Core</AssemblyName>
+  </PropertyGroup>
+</Project>
+

@@ -2,13 +2,13 @@
 
 ## Decision
 
-For version 0.1, the project should use a mixed Windows-native architecture:
+For version 0.1, the project will use a mixed Windows-native architecture:
 
 - Native C++/Win32 COM Shell Extension for Explorer integration.
 - .NET tray app for queue display, settings, and user-facing state.
 - .NET worker for queue execution behind a narrow file-operation abstraction.
 - Shared .NET core library for job model, persistence, settings, and IPC contracts.
-- WiX Toolset installer for registration, upgrades, and clean removal.
+- Installer strategy to be selected after evaluating WiX Toolset and Inno Setup.
 
 The Shell Extension must stay thin. It should collect Explorer selection data, validate the request, and hand it to the app or worker through local IPC. It should not copy files, maintain the queue, open long-running UI, or make complex policy decisions inside Explorer.
 
@@ -28,10 +28,26 @@ Version 0.1 should ship only what can be made reliable:
 - One active job at a time.
 - Minimal tray app.
 - Explicit Explorer context menu integration.
-- WiX installer with optional Explorer integration.
-- Worker prototype using `IFileOperation` first, with the implementation hidden behind an internal interface.
+- Installer with optional Explorer integration.
+- Worker prototype with file-operation implementation hidden behind an internal interface.
 
 Modifier-based drag-and-drop should remain a research spike until proven on Windows 10 and Windows 11. It should not be required for the first usable release.
+
+## Current Implementation Boundary
+
+The first code step is intentionally limited to `FileOperationQueue.Core`:
+
+- Job model.
+- Queue status transitions.
+- JSON queue persistence.
+- Local worker loop.
+- Executor interface.
+- No Shell Extension.
+- No COM code.
+- No Explorer hook.
+- No production file-copy engine yet.
+
+The current worker uses an executor abstraction. This keeps queue behavior testable before deciding whether production file operations use `IFileOperation`, lower-level Windows APIs, or a native component.
 
 ## Rejected As Primary Architecture
 
@@ -64,7 +80,7 @@ Recommended build order:
 
 ## Open Questions
 
-- Should the worker stay fully .NET if `IFileOperation` interop is reliable enough?
+- Should the production worker stay fully .NET if `IFileOperation` interop is reliable enough?
 - Does `IFileOperation` provide the right progress and conflict behavior for the minimal UI?
 - Which IPC mechanism is most reliable under Explorer startup, app-not-running, and upgrade scenarios?
 - Can modifier-based drag-and-drop be implemented without surprising Explorer users?

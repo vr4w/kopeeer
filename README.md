@@ -56,6 +56,23 @@ The preferred direction is a mixed architecture:
 
 See [docs/architecture.md](docs/architecture.md), [docs/architecture-decision.md](docs/architecture-decision.md), [docs/concept.md](docs/concept.md), and [docs/windows-integration.md](docs/windows-integration.md).
 
+## Current Code
+
+The first code is intentionally small:
+
+- Neutral `FileOperationQueue.Core` namespace.
+- Queue job model and statuses.
+- JSON queue persistence.
+- Local worker boundary.
+- No Shell Extension.
+- No Explorer hook.
+- No production copy engine yet.
+
+Development target:
+
+- .NET 8 SDK for the queue core.
+- Windows 10/11 for real file-operation and Explorer integration testing.
+
 ## Freeware
 
 Kopeeer, or whatever final name is chosen, is planned as freeware.
