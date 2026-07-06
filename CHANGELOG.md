@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project intends to follow semantic versioning once releases begin.
 
+## 0.5.0-beta - 2026-07-07
+
+### Added
+
+- Target conflict choices when a file or folder already exists: rename, skip, or cancel queue.
+- Transfer size display in the compact window, for example `20 MB of 200 MB`.
+- Upcoming queue rows now show file size and copy/move action.
+- Beta installer version for the next test cycle.
+
+### Changed
+
+- Made the compact transfer window fixed-size to avoid broken resizing.
+- Removed the expandable manual input area from the compact transfer window.
+- Changed the completed-state button from red `Cancel` to a quiet `Close`.
+- Made the upcoming queue area grow with pending files before scrolling.
+- Refined installer wording toward a set-it-and-forget-it Explorer integration.
+
 ## 0.3.0-alpha - 2026-07-06
 
 ### Added

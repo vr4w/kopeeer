@@ -9,10 +9,15 @@ public sealed class FileOperationProcessor
     public Task ProcessAsync(
         QueueJob job,
         Action<QueueJob>? onProgress = null,
+        Func<QueueJob, string, TargetConflictResolution>? onTargetConflict = null,
         CancellationToken cancellationToken = default) =>
-        Task.Run(() => Process(job, onProgress, cancellationToken), cancellationToken);
+        Task.Run(() => Process(job, onProgress, onTargetConflict, cancellationToken), cancellationToken);
 
-    private static void Process(QueueJob job, Action<QueueJob>? onProgress, CancellationToken cancellationToken)
+    private static void Process(
+        QueueJob job,
+        Action<QueueJob>? onProgress,
+        Func<QueueJob, string, TargetConflictResolution>? onTargetConflict,
+        CancellationToken cancellationToken)
     {
         if (!File.Exists(job.SourcePath) && !Directory.Exists(job.SourcePath))
         {
@@ -28,20 +33,23 @@ public sealed class FileOperationProcessor
         {
             job.TotalBytes = new FileInfo(job.SourcePath).Length;
             job.TransferredBytes = 0;
-            ProcessFile(job, onProgress, cancellationToken);
+            ProcessFile(job, onProgress, onTargetConflict, cancellationToken);
             return;
         }
 
         job.TotalBytes = GetDirectorySize(job.SourcePath);
         job.TransferredBytes = 0;
-        ProcessDirectory(job, onProgress, cancellationToken);
+        ProcessDirectory(job, onProgress, onTargetConflict, cancellationToken);
     }
 
-    private static void ProcessFile(QueueJob job, Action<QueueJob>? onProgress, CancellationToken cancellationToken)
+    private static void ProcessFile(
+        QueueJob job,
+        Action<QueueJob>? onProgress,
+        Func<QueueJob, string, TargetConflictResolution>? onTargetConflict,
+        CancellationToken cancellationToken)
     {
         var fileName = Path.GetFileName(job.SourcePath);
-        var targetPath = Path.Combine(job.TargetFolder, fileName);
-        EnsureTargetDoesNotExist(targetPath);
+        var targetPath = ResolveTargetPath(job, Path.Combine(job.TargetFolder, fileName), onTargetConflict, cancellationToken);
 
         CopyFileWithProgress(job.SourcePath, targetPath, job, onProgress, cancellationToken);
 
@@ -51,12 +59,15 @@ public sealed class FileOperationProcessor
         }
     }
 
-    private static void ProcessDirectory(QueueJob job, Action<QueueJob>? onProgress, CancellationToken cancellationToken)
+    private static void ProcessDirectory(
+        QueueJob job,
+        Action<QueueJob>? onProgress,
+        Func<QueueJob, string, TargetConflictResolution>? onTargetConflict,
+        CancellationToken cancellationToken)
     {
         var directoryName = Path.GetFileName(
             job.SourcePath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-        var targetPath = Path.Combine(job.TargetFolder, directoryName);
-        EnsureTargetDoesNotExist(targetPath);
+        var targetPath = ResolveTargetPath(job, Path.Combine(job.TargetFolder, directoryName), onTargetConflict, cancellationToken);
         EnsureDirectoryTargetIsNotInsideSource(job.SourcePath, targetPath);
 
         CopyDirectory(job.SourcePath, targetPath, job, onProgress, cancellationToken);
@@ -140,12 +151,50 @@ public sealed class FileOperationProcessor
         return total;
     }
 
-    private static void EnsureTargetDoesNotExist(string targetPath)
+    private static string ResolveTargetPath(
+        QueueJob job,
+        string targetPath,
+        Func<QueueJob, string, TargetConflictResolution>? onTargetConflict,
+        CancellationToken cancellationToken)
     {
-        if (File.Exists(targetPath) || Directory.Exists(targetPath))
+        while (File.Exists(targetPath) || Directory.Exists(targetPath))
         {
-            throw new IOException($"Target already exists: {targetPath}");
+            cancellationToken.ThrowIfCancellationRequested();
+            var resolution = onTargetConflict?.Invoke(job, targetPath) ?? TargetConflictResolution.Cancel;
+            targetPath = resolution switch
+            {
+                TargetConflictResolution.Rename => BuildUniqueTargetPath(targetPath),
+                TargetConflictResolution.Skip => throw new OperationSkippedException($"Skipped existing target: {targetPath}"),
+                TargetConflictResolution.Cancel => throw new OperationCanceledException(cancellationToken),
+                _ => throw new OperationCanceledException(cancellationToken)
+            };
         }
+
+        return targetPath;
+    }
+
+    private static string BuildUniqueTargetPath(string targetPath)
+    {
+        var directory = Path.GetDirectoryName(targetPath);
+        var fileName = Path.GetFileNameWithoutExtension(targetPath);
+        var extension = Path.GetExtension(targetPath);
+
+        if (Directory.Exists(targetPath))
+        {
+            fileName = Path.GetFileName(targetPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+            extension = string.Empty;
+        }
+
+        for (var index = 2; index < 10_000; index++)
+        {
+            var candidate = Path.Combine(directory ?? string.Empty, $"{fileName} ({index}){extension}");
+            if (!File.Exists(candidate) && !Directory.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        throw new IOException($"Could not create a unique target name for: {targetPath}");
     }
 
     private static void EnsureDirectoryTargetIsNotInsideSource(string sourceDirectory, string targetDirectory)

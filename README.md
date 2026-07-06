@@ -4,11 +4,11 @@ Kopeeer is a small Windows transfer queue for Explorer copy and move jobs.
 
 It lets you right-drag files or folders onto a destination folder, choose `Copy with Kopeeer` or `Move with Kopeeer`, and then processes the jobs one after another in a compact transfer window.
 
-Status: `0.3.0-alpha`. Use test files first.
+Status: `0.5.0-beta`. Use test files first.
 
 ## Download For Windows
 
-**[Download Kopeeer-Setup-0.3.0-alpha.exe](https://github.com/vr4w/kopeeer/releases/download/v0.3.0-alpha/Kopeeer-Setup-0.3.0-alpha.exe)**
+**[Download Kopeeer-Setup-0.5.0-beta.exe](https://github.com/vr4w/kopeeer/releases/download/v0.5.0-beta/Kopeeer-Setup-0.5.0-beta.exe)**
 
 This is the installer for normal Windows use. Download it, run it, and keep `Add Explorer context menu commands` enabled.
 
@@ -21,7 +21,7 @@ If the direct download link above does not work, open the latest release and dow
 **[Open Kopeeer Releases](https://github.com/vr4w/kopeeer/releases/latest)**
 
 ```text
-Kopeeer-Setup-0.3.0-alpha.exe
+Kopeeer-Setup-0.5.0-beta.exe
 ```
 
 The installer asks for administrator approval because Windows Explorer loads the right-drag shell extension reliably when it is registered machine-wide.
@@ -37,7 +37,9 @@ The installer asks for administrator approval because Windows Explorer loads the
   - current file name
   - overall progress bar
   - transfer speed
+  - copied size such as `20 MB of 200 MB`
   - upcoming job list
+  - upcoming file sizes
   - copy/move status per job
 - Windows dark-mode aware UI.
 - Optional `Shut down when done`.
@@ -97,7 +99,7 @@ scripts\build-installer.ps1
 Expected output:
 
 ```text
-artifacts\installer\Kopeeer-Setup-0.3.0-alpha.exe
+artifacts\installer\Kopeeer-Setup-0.5.0-beta.exe
 ```
 
 ## Repository Shape
@@ -120,8 +122,8 @@ The current Explorer integration is based on a native shell extension. Early exp
 
 Before Kopeeer should be called `1.0`, the main goal is reliability:
 
-- Clear overwrite/skip behavior when a target file already exists.
-- Better cancellation behavior for very large files and folders.
+- More testing of overwrite/skip/rename behavior when a target file already exists.
+- Better cancellation behavior for very large folders.
 - A small settings screen for defaults such as shutdown behavior.
 - Cleaner release notes and screenshots for non-technical users.
 - More real-world testing on Windows 10 and Windows 11.

@@ -37,11 +37,12 @@ public sealed class MainForm : Form
     private readonly Label _currentFileLabel = new();
     private readonly Label _overallPercentLabel = new();
     private readonly Label _speedLabel = new();
+    private readonly Label _bytesLabel = new();
     private readonly ThinProgressBar _overallProgressBar = new();
-    private readonly ListBox _queueList = new();
+    private readonly FlowLayoutPanel _queueList = new();
     private readonly Panel _emptyState = new();
     private readonly Panel _manualPanel = new();
-    private readonly RowStyle _manualRowStyle = new(SizeType.Absolute, 0);
+    private readonly RowStyle _queueRowStyle = new(SizeType.Absolute, 26);
     private CancellationTokenSource? _queueCancellationSource;
     private bool _closeAfterCancel;
     private bool _forceCloseRequested;
@@ -50,8 +51,9 @@ public sealed class MainForm : Form
     {
         Text = "Kopeeer";
         StartPosition = FormStartPosition.CenterScreen;
-        MinimumSize = new Size(480, 250);
-        Size = new Size(560, 300);
+        FormBorderStyle = FormBorderStyle.FixedSingle;
+        MaximizeBox = false;
+        ClientSize = new Size(444, 178);
         BackColor = WindowBackground;
         Font = new Font("Segoe UI", 9F);
 
@@ -73,22 +75,18 @@ public sealed class MainForm : Form
         {
             Dock = DockStyle.Fill,
             ColumnCount = 1,
-            RowCount = 5,
-            Padding = new Padding(12),
+            RowCount = 3,
+            Padding = new Padding(10),
             BackColor = WindowBackground
         };
 
-        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 32));
-        root.RowStyles.Add(_manualRowStyle);
-        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 112));
-        root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 22));
+        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 92));
+        root.RowStyles.Add(_queueRowStyle);
+        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
 
-        root.Controls.Add(BuildActions(), 0, 0);
-        root.Controls.Add(BuildManualInputArea(), 0, 1);
-        root.Controls.Add(BuildTransferPanel(), 0, 2);
-        root.Controls.Add(BuildQueueArea(), 0, 3);
-        root.Controls.Add(BuildStatusBar(), 0, 4);
+        root.Controls.Add(BuildTransferPanel(), 0, 0);
+        root.Controls.Add(BuildQueueArea(), 0, 1);
+        root.Controls.Add(BuildActions(), 0, 2);
 
         return root;
     }
@@ -134,14 +132,12 @@ public sealed class MainForm : Form
         };
 
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 88));
-        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 94));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 160));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 76));
 
         _startButton.Visible = false;
         _clearCompletedButton.Visible = false;
-        StyleGhostButton(_manualButton, "Open Kopeeer");
-        _manualButton.Size = new Size(88, 24);
-        _manualButton.Margin = new Padding(6, 3, 0, 3);
+        _manualButton.Visible = false;
 
         _shutdownWhenDoneCheckBox.Text = "Shut down when done";
         _shutdownWhenDoneCheckBox.AutoSize = true;
@@ -149,12 +145,16 @@ public sealed class MainForm : Form
         _shutdownWhenDoneCheckBox.Margin = new Padding(0, 7, 0, 0);
         _shutdownWhenDoneCheckBox.BackColor = WindowBackground;
 
+        _statusLabel.Dock = DockStyle.Fill;
+        _statusLabel.ForeColor = TextMuted;
+        _statusLabel.TextAlign = ContentAlignment.MiddleLeft;
+        _statusLabel.AutoEllipsis = true;
+
         _startButton.Click += async (_, _) => await StartQueueAsync();
         _clearCompletedButton.Click += (_, _) => ClearCompleted();
-        _manualButton.Click += (_, _) => ToggleManualPanel();
 
-        panel.Controls.Add(_shutdownWhenDoneCheckBox, 0, 0);
-        panel.Controls.Add(_manualButton, 2, 0);
+        panel.Controls.Add(_statusLabel, 0, 0);
+        panel.Controls.Add(_shutdownWhenDoneCheckBox, 1, 0);
 
         return panel;
     }
@@ -235,14 +235,13 @@ public sealed class MainForm : Form
         {
             Dock = DockStyle.Fill,
             BackColor = WindowBackground,
-            Padding = new Padding(0, 8, 0, 0)
+            Padding = new Padding(0, 2, 0, 2)
         };
 
         _queueList.Dock = DockStyle.Fill;
-        _queueList.BorderStyle = BorderStyle.None;
-        _queueList.IntegralHeight = false;
-        _queueList.Font = new Font("Segoe UI", 9F);
-        _queueList.ForeColor = TextPrimary;
+        _queueList.FlowDirection = FlowDirection.TopDown;
+        _queueList.WrapContents = false;
+        _queueList.AutoScroll = false;
         _queueList.BackColor = WindowBackground;
 
         _emptyState.Dock = DockStyle.Fill;
@@ -251,7 +250,7 @@ public sealed class MainForm : Form
         {
             Dock = DockStyle.Fill,
             ForeColor = TextMuted,
-            Text = "No more files in queue",
+            Text = "",
             TextAlign = ContentAlignment.MiddleCenter
         });
 
@@ -265,9 +264,9 @@ public sealed class MainForm : Form
         var panel = new Panel
         {
             Dock = DockStyle.Fill,
-            BackColor = PanelBackground,
-            Padding = new Padding(12, 9, 12, 10),
-            Margin = new Padding(0, 4, 0, 6)
+            BackColor = WindowBackground,
+            Padding = new Padding(0, 0, 0, 2),
+            Margin = new Padding(0)
         };
 
         var layout = new TableLayoutPanel
@@ -275,31 +274,31 @@ public sealed class MainForm : Form
             Dock = DockStyle.Fill,
             ColumnCount = 4,
             RowCount = 4,
-            BackColor = PanelBackground
+            BackColor = WindowBackground
         };
 
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 96));
-        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 74));
-        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 96));
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 20));
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 31));
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 25));
-        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 14));
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 88));
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 64));
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 76));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 22));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 24));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 22));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 16));
 
         _operationLabel.Dock = DockStyle.Fill;
         _operationLabel.ForeColor = TextMuted;
-        _operationLabel.Font = new Font(Font.FontFamily, 8.5F, FontStyle.Bold);
+        _operationLabel.Font = new Font(Font.FontFamily, 9F, FontStyle.Regular);
         _operationLabel.Text = "Ready";
 
         _currentFileLabel.Dock = DockStyle.Fill;
-        _currentFileLabel.Font = new Font(Font.FontFamily, 11F, FontStyle.Bold);
+        _currentFileLabel.Font = new Font(Font.FontFamily, 10.5F, FontStyle.Regular);
         _currentFileLabel.ForeColor = TextPrimary;
         _currentFileLabel.AutoEllipsis = true;
         _currentFileLabel.Text = "No active transfer";
 
         _overallPercentLabel.Dock = DockStyle.Fill;
-        _overallPercentLabel.Font = new Font(Font.FontFamily, 15F, FontStyle.Bold);
+        _overallPercentLabel.Font = new Font(Font.FontFamily, 14F, FontStyle.Regular);
         _overallPercentLabel.ForeColor = Accent;
         _overallPercentLabel.TextAlign = ContentAlignment.MiddleRight;
         _overallPercentLabel.Text = "0%";
@@ -309,15 +308,30 @@ public sealed class MainForm : Form
         _speedLabel.TextAlign = ContentAlignment.MiddleRight;
         _speedLabel.Text = "";
 
+        _bytesLabel.Dock = DockStyle.Fill;
+        _bytesLabel.ForeColor = TextMuted;
+        _bytesLabel.TextAlign = ContentAlignment.MiddleLeft;
+        _bytesLabel.AutoEllipsis = true;
+        _bytesLabel.Text = "";
+
         _overallProgressBar.Dock = DockStyle.Fill;
-        _overallProgressBar.BackColor = PanelBackground;
+        _overallProgressBar.BackColor = WindowBackground;
         _overallProgressBar.TrackColor = IsDarkMode ? Color.FromArgb(49, 50, 54) : Color.FromArgb(232, 235, 240);
         _overallProgressBar.BarColor = Accent;
 
         StyleDangerButton(_cancelButton, "Cancel");
         _cancelButton.Dock = DockStyle.Fill;
-        _cancelButton.Margin = new Padding(8, 19, 0, 19);
-        _cancelButton.Click += (_, _) => CancelQueue();
+        _cancelButton.Margin = new Padding(8, 28, 0, 12);
+        _cancelButton.Click += (_, _) =>
+        {
+            if (_queueProcessor.IsRunning)
+            {
+                CancelQueue();
+                return;
+            }
+
+            Close();
+        };
 
         layout.Controls.Add(_operationLabel, 0, 0);
         layout.SetColumnSpan(_operationLabel, 3);
@@ -328,13 +342,10 @@ public sealed class MainForm : Form
         layout.SetRowSpan(_cancelButton, 4);
         layout.Controls.Add(_overallProgressBar, 0, 2);
         layout.SetColumnSpan(_overallProgressBar, 3);
+        layout.Controls.Add(_bytesLabel, 0, 3);
+        layout.SetColumnSpan(_bytesLabel, 3);
 
         panel.Controls.Add(layout);
-        panel.Paint += (_, args) =>
-        {
-            using var pen = new Pen(Border);
-            args.Graphics.DrawRectangle(pen, 0, 0, panel.Width - 1, panel.Height - 1);
-        };
 
         return panel;
     }
@@ -405,13 +416,6 @@ public sealed class MainForm : Form
     {
         _sourceTextBox.TextChanged += (_, _) => RefreshActions();
         _targetTextBox.TextChanged += (_, _) => RefreshActions();
-    }
-
-    private void ToggleManualPanel()
-    {
-        _manualPanel.Visible = !_manualPanel.Visible;
-        _manualRowStyle.Height = _manualPanel.Visible ? 132 : 0;
-        _manualButton.Text = _manualPanel.Visible ? "Close" : "Open Kopeeer";
     }
 
     private void SelectSourceFile()
@@ -497,9 +501,9 @@ public sealed class MainForm : Form
 
         try
         {
-            await _queueProcessor.ProcessAllAsync(RefreshQueueList, _ => RefreshQueueList(), _queueCancellationSource.Token);
+            await _queueProcessor.ProcessAllAsync(RefreshQueueList, _ => RefreshQueueList(), ResolveTargetConflict, _queueCancellationSource.Token);
             UpdateStatus(BuildCompletionMessage());
-            if (_shutdownWhenDoneCheckBox.Checked && _jobs.Count > 0 && _jobs.All(job => job.Status is JobStatus.Completed or JobStatus.Failed))
+            if (_shutdownWhenDoneCheckBox.Checked && _jobs.Count > 0 && _jobs.All(IsFinished))
             {
                 UpdateStatus("Done. Windows will shut down in 30 seconds.");
                 Process.Start(new ProcessStartInfo
@@ -569,7 +573,7 @@ public sealed class MainForm : Form
 
     private void ClearCompleted()
     {
-        foreach (var job in _jobs.Where(job => job.Status == JobStatus.Completed).ToArray())
+        foreach (var job in _jobs.Where(job => job.Status is JobStatus.Completed or JobStatus.Skipped).ToArray())
         {
             _jobs.Remove(job);
         }
@@ -587,18 +591,86 @@ public sealed class MainForm : Form
         }
 
         var pendingJobs = _jobs.Where(job => job.Status == JobStatus.Pending).ToArray();
-        _queueList.BeginUpdate();
-        _queueList.Items.Clear();
+        _queueList.SuspendLayout();
+        _queueList.Controls.Clear();
         foreach (var job in pendingJobs)
         {
-            _queueList.Items.Add($"{DisplayName(job.SourcePath)}    {job.OperationType}");
+            _queueList.Controls.Add(BuildQueueRow(job));
         }
-        _queueList.EndUpdate();
+        _queueList.ResumeLayout();
 
         _emptyState.Visible = pendingJobs.Length == 0;
         _queueList.Visible = pendingJobs.Length > 0;
+        ResizeQueueArea(pendingJobs.Length);
         UpdateTransferPanel();
         RefreshActions();
+    }
+
+    private Control BuildQueueRow(QueueJob job)
+    {
+        var row = new TableLayoutPanel
+        {
+            Width = Math.Max(360, _queueList.ClientSize.Width - 20),
+            Height = 22,
+            ColumnCount = 3,
+            RowCount = 1,
+            Margin = new Padding(0, 0, 0, 1),
+            BackColor = WindowBackground
+        };
+
+        row.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        row.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 72));
+        row.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 46));
+        row.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+
+        row.Controls.Add(new Label
+        {
+            Dock = DockStyle.Fill,
+            ForeColor = TextPrimary,
+            Font = new Font("Segoe UI", 8.25F),
+            Text = DisplayName(job.SourcePath),
+            AutoEllipsis = true,
+            TextAlign = ContentAlignment.MiddleLeft
+        }, 0, 0);
+
+        row.Controls.Add(new Label
+        {
+            Dock = DockStyle.Fill,
+            ForeColor = TextMuted,
+            Font = new Font("Segoe UI", 8.25F),
+            Text = FormatSourceSize(job.SourcePath),
+            AutoEllipsis = true,
+            TextAlign = ContentAlignment.MiddleRight
+        }, 1, 0);
+
+        row.Controls.Add(new Label
+        {
+            Dock = DockStyle.Fill,
+            ForeColor = TextPrimary,
+            Font = new Font("Segoe UI", 8.25F),
+            Text = job.OperationType.ToString(),
+            TextAlign = ContentAlignment.MiddleRight
+        }, 2, 0);
+
+        return row;
+    }
+
+    private void ResizeQueueArea(int pendingCount)
+    {
+        const int baseClientHeight = 142;
+        const int rowHeight = 23;
+        const int maxVisibleRows = 5;
+
+        var visibleRows = Math.Min(pendingCount, maxVisibleRows);
+        var queueHeight = pendingCount == 0 ? 26 : 6 + visibleRows * rowHeight;
+        _queueRowStyle.Height = queueHeight;
+        _queueList.AutoScroll = pendingCount > maxVisibleRows;
+
+        var targetHeight = baseClientHeight + queueHeight;
+        if (ClientSize.Height != targetHeight)
+        {
+            ClientSize = new Size(ClientSize.Width, targetHeight);
+        }
     }
 
     private void RefreshActions()
@@ -610,9 +682,17 @@ public sealed class MainForm : Form
 
         _addButton.Enabled = hasSource && hasTarget && !isRunning;
         _startButton.Enabled = hasPending && !isRunning;
-        _clearCompletedButton.Enabled = _jobs.Any(job => job.Status == JobStatus.Completed) && !isRunning;
-        _manualButton.Enabled = !isRunning;
+        _clearCompletedButton.Enabled = _jobs.Any(job => job.Status is JobStatus.Completed or JobStatus.Skipped) && !isRunning;
         _cancelButton.Enabled = true;
+        if (isRunning)
+        {
+            StyleDangerButton(_cancelButton, "Cancel");
+        }
+        else
+        {
+            StyleGhostButton(_cancelButton, "Close");
+        }
+
         _summaryLabel.Text = BuildSummary();
     }
 
@@ -629,17 +709,34 @@ public sealed class MainForm : Form
             return $"{activeIndex + 1} of {_jobs.Count}";
         }
 
-        var completed = _jobs.Count(job => job.Status is JobStatus.Completed or JobStatus.Failed);
+        var completed = _jobs.Count(IsFinished);
         var failed = _jobs.Count(job => job.Status == JobStatus.Failed);
-        return failed > 0
-            ? $"{completed} of {_jobs.Count}, {failed} failed"
+        var skipped = _jobs.Count(job => job.Status == JobStatus.Skipped);
+        return failed > 0 || skipped > 0
+            ? $"{completed} of {_jobs.Count}, {failed} failed, {skipped} skipped"
             : $"{completed} of {_jobs.Count}";
     }
 
     private string BuildCompletionMessage()
     {
         var failed = _jobs.Count(job => job.Status == JobStatus.Failed);
-        return failed == 0 ? "Done" : $"Done with {failed} failed";
+        var skipped = _jobs.Count(job => job.Status == JobStatus.Skipped);
+        if (failed == 0 && skipped == 0)
+        {
+            return "Done";
+        }
+
+        if (failed == 0)
+        {
+            return $"{skipped} skipped";
+        }
+
+        if (skipped == 0)
+        {
+            return $"{failed} failed";
+        }
+
+        return $"{failed} failed, {skipped} skipped";
     }
 
     private void UpdateTransferPanel()
@@ -649,21 +746,30 @@ public sealed class MainForm : Form
         var totalBytes = active?.TotalBytes ?? 0;
         var transferredBytes = active?.TransferredBytes ?? 0;
         var percent = totalBytes <= 0 ? 0 : (int)Math.Clamp(transferredBytes * 100 / totalBytes, 0, 100);
+        var finished = _jobs.Count > 0 && _jobs.All(IsFinished);
+
+        if (running is null && finished)
+        {
+            percent = 100;
+        }
 
         _overallProgressBar.Value = percent;
         _overallPercentLabel.Text = $"{percent}%";
+        _bytesLabel.Text = FormatTransferSize(transferredBytes, totalBytes);
 
         if (running is null)
         {
             var pending = _jobs.FirstOrDefault(job => job.Status == JobStatus.Pending);
             var failed = _jobs.Any(job => job.Status == JobStatus.Failed);
+            var skipped = _jobs.Any(job => job.Status == JobStatus.Skipped);
             var lastFailed = _jobs.LastOrDefault(job => job.Status == JobStatus.Failed);
-            var completed = _jobs.Count > 0 && _jobs.All(job => job.Status is JobStatus.Completed or JobStatus.Failed);
+            var lastSkipped = _jobs.LastOrDefault(job => job.Status == JobStatus.Skipped);
+            var completed = finished;
 
             _operationLabel.Text = _jobs.Count == 0
                 ? "Ready"
                 : completed
-                    ? failed ? "Could not finish" : "Done"
+                    ? failed ? "Could not finish" : skipped ? "Finished with skipped files" : "Done"
                     : pending is not null
                         ? BuildTransferLabel(pending)
                         : "Ready";
@@ -672,11 +778,16 @@ public sealed class MainForm : Form
                 : completed
                     ? failed && lastFailed is not null
                         ? BuildFailureMessage(lastFailed)
+                        : skipped && lastSkipped is not null
+                            ? BuildFailureMessage(lastSkipped)
                         : "Queue finished"
                     : pending is not null
                         ? DisplayName(pending.SourcePath)
                         : "No active transfer";
             _speedLabel.Text = "";
+            _bytesLabel.Text = completed && totalBytes > 0
+                ? FormatTransferSize(totalBytes, totalBytes)
+                : FormatTransferSize(transferredBytes, totalBytes);
             return;
         }
 
@@ -686,6 +797,7 @@ public sealed class MainForm : Form
         _operationLabel.Text = BuildTransferLabel(running);
         _currentFileLabel.Text = currentName;
         _speedLabel.Text = FormatSpeed(running.BytesPerSecond);
+        _bytesLabel.Text = FormatTransferSize(running.TransferredBytes, running.TotalBytes);
     }
 
     private string BuildTransferLabel(QueueJob job)
@@ -719,6 +831,11 @@ public sealed class MainForm : Form
     private static string BuildFailureMessage(QueueJob job)
     {
         var fileName = DisplayName(job.SourcePath);
+        if (job.Status == JobStatus.Skipped)
+        {
+            return $"{fileName} skipped";
+        }
+
         if (job.ErrorMessage?.Contains("already exists", StringComparison.OrdinalIgnoreCase) == true)
         {
             return $"{fileName} already exists";
@@ -748,11 +865,73 @@ public sealed class MainForm : Form
         return $"{value:0.0} {units[unit]}";
     }
 
+    private static string FormatTransferSize(long transferredBytes, long totalBytes)
+    {
+        if (totalBytes <= 0)
+        {
+            return "";
+        }
+
+        return $"{FormatMegabytes(transferredBytes)} of {FormatMegabytes(totalBytes)}";
+    }
+
+    private static string FormatSourceSize(string sourcePath)
+    {
+        try
+        {
+            if (File.Exists(sourcePath))
+            {
+                return FormatMegabytes(new FileInfo(sourcePath).Length);
+            }
+
+            if (Directory.Exists(sourcePath))
+            {
+                long total = 0;
+                foreach (var file in Directory.EnumerateFiles(sourcePath, "*", SearchOption.AllDirectories))
+                {
+                    total += new FileInfo(file).Length;
+                }
+
+                return FormatMegabytes(total);
+            }
+        }
+        catch
+        {
+            return "";
+        }
+
+        return "";
+    }
+
+    private static string FormatMegabytes(long bytes)
+    {
+        var megabytes = bytes / 1024d / 1024d;
+        return megabytes < 10
+            ? $"{megabytes:0.0} MB"
+            : $"{megabytes:0} MB";
+    }
+
     private void UpdateStatus(string message)
     {
         _statusLabel.Text = message;
         _summaryLabel.Text = BuildSummary();
     }
+
+    private TargetConflictResolution ResolveTargetConflict(QueueJob job, string targetPath)
+    {
+        if (InvokeRequired)
+        {
+            return (TargetConflictResolution)Invoke(() => ResolveTargetConflict(job, targetPath));
+        }
+
+        using var dialog = new TargetConflictDialog(DisplayName(job.SourcePath), targetPath);
+        return dialog.ShowDialog(this) == DialogResult.OK
+            ? dialog.Resolution
+            : TargetConflictResolution.Cancel;
+    }
+
+    private static bool IsFinished(QueueJob job) =>
+        job.Status is JobStatus.Completed or JobStatus.Failed or JobStatus.Skipped;
 
     private static bool DetectWindowsDarkMode()
     {
@@ -817,6 +996,97 @@ public sealed class MainForm : Form
         if (autoStart && !_queueProcessor.IsRunning && _jobs.Any(job => job.Status == JobStatus.Pending))
         {
             await StartQueueAsync();
+        }
+    }
+
+    private sealed class TargetConflictDialog : Form
+    {
+        public TargetConflictResolution Resolution { get; private set; } = TargetConflictResolution.Cancel;
+
+        public TargetConflictDialog(string sourceName, string targetPath)
+        {
+            Text = "Kopeeer";
+            StartPosition = FormStartPosition.CenterParent;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MinimizeBox = false;
+            MaximizeBox = false;
+            ShowInTaskbar = false;
+            ClientSize = new Size(380, 142);
+            BackColor = WindowBackground;
+            Font = new Font("Segoe UI", 9F);
+
+            var root = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 1,
+                RowCount = 3,
+                Padding = new Padding(14),
+                BackColor = WindowBackground
+            };
+
+            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
+            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 34));
+
+            root.Controls.Add(new Label
+            {
+                Dock = DockStyle.Fill,
+                ForeColor = TextPrimary,
+                Font = new Font("Segoe UI", 10F, FontStyle.Regular),
+                Text = $"{sourceName} already exists.",
+                AutoEllipsis = true,
+                TextAlign = ContentAlignment.MiddleLeft
+            }, 0, 0);
+
+            root.Controls.Add(new Label
+            {
+                Dock = DockStyle.Fill,
+                ForeColor = TextMuted,
+                Text = $"Target: {targetPath}",
+                AutoEllipsis = true,
+                TextAlign = ContentAlignment.TopLeft
+            }, 0, 1);
+
+            var buttons = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                FlowDirection = FlowDirection.RightToLeft,
+                WrapContents = false,
+                BackColor = WindowBackground
+            };
+
+            var cancelButton = MakeDialogButton("Cancel queue", TargetConflictResolution.Cancel);
+            var skipButton = MakeDialogButton("Skip", TargetConflictResolution.Skip);
+            var renameButton = MakeDialogButton("Rename", TargetConflictResolution.Rename);
+
+            buttons.Controls.Add(cancelButton);
+            buttons.Controls.Add(skipButton);
+            buttons.Controls.Add(renameButton);
+            root.Controls.Add(buttons, 0, 2);
+            Controls.Add(root);
+
+            AcceptButton = renameButton;
+            CancelButton = cancelButton;
+        }
+
+        private Button MakeDialogButton(string text, TargetConflictResolution resolution)
+        {
+            var button = new Button
+            {
+                Text = text,
+                Size = new Size(text.Length > 8 ? 92 : 72, 26),
+                Margin = new Padding(6, 4, 0, 0),
+                FlatStyle = FlatStyle.System
+            };
+
+            button.Click += (_, _) =>
+            {
+                Resolution = resolution;
+                DialogResult = DialogResult.OK;
+                Close();
+            };
+
+            return button;
         }
     }
 

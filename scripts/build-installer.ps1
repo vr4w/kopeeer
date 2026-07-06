@@ -1,7 +1,7 @@
 param(
     [string]$Configuration = "Release",
     [string]$Runtime = "win-x64",
-    [string]$Version = "0.3.0-alpha",
+    [string]$Version = "0.5.0-beta",
     [bool]$SelfContained = $true,
     [string]$InnoCompilerPath
 )

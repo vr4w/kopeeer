@@ -2,7 +2,7 @@
 ; Build on Windows through scripts\build-installer.ps1.
 
 #ifndef AppVersion
-#define AppVersion "0.3.0-alpha"
+#define AppVersion "0.5.0-beta"
 #endif
 
 #ifndef PublishDir
@@ -18,17 +18,24 @@
 #endif
 
 #define AppName "Kopeeer"
-#define AppPublisher "file-operation-queue contributors"
+#define AppPublisher "vr4w"
 #define AppExeName "Kopeeer.App.exe"
+#define AppUrl "https://github.com/vr4w/kopeeer"
 
 [Setup]
 AppId={{8F7F8CF9-13CE-4E1C-8E8D-FA4D54BB4A47}
 AppName={#AppName}
+AppVerName={#AppName} {#AppVersion}
 AppVersion={#AppVersion}
 AppPublisher={#AppPublisher}
+AppPublisherURL={#AppUrl}
+AppSupportURL={#AppUrl}/issues
+AppUpdatesURL={#AppUrl}/releases
+AppComments=Explorer-first copy and move queue for Windows.
 DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
+WizardStyle=modern
 OutputDir={#OutputDir}
 OutputBaseFilename=Kopeeer-Setup-{#AppVersion}
 Compression=lzma
@@ -38,15 +45,18 @@ PrivilegesRequired=admin
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayIcon={app}\{#AppExeName}
 
+[Messages]
+WelcomeLabel1=Install Kopeeer
+WelcomeLabel2=Kopeeer adds Copy with Kopeeer and Move with Kopeeer to Windows Explorer. Install it once, then use it from Explorer's right-drag menu. No separate app window needs to stay open.
+FinishedHeadingLabel=Kopeeer is installed
+FinishedLabel=Kopeeer is ready in Windows Explorer. Right-drag files or folders onto a target folder and choose Copy with Kopeeer or Move with Kopeeer.
+
 [Files]
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#DropHandlerDir}\Kopeeer.ShellExtension.dll"; DestDir: "{app}\Shell"; Flags: ignoreversion
 
 [Tasks]
-Name: "explorercontext"; Description: "Add Explorer context menu commands"; GroupDescription: "Windows Explorer integration:"; Flags: checkedonce
-
-[Icons]
-Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"
+Name: "explorercontext"; Description: "Add Kopeeer to Explorer right-drag menus"; GroupDescription: "Windows Explorer integration:"; Flags: checkedonce
 
 [Registry]
 Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Copy with Kopeeer..."; Flags: uninsdeletekey; Tasks: explorercontext
@@ -74,5 +84,3 @@ Root: HKLM; Subkey: "Software\Classes\Folder\shellex\DragDropHandlers\Kopeeer"; 
 Root: HKLM; Subkey: "Software\Classes\Drive\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
 Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved"; ValueType: string; ValueName: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueData: "Kopeeer Right-Drag Menu"; Flags: uninsdeletevalue; Tasks: explorercontext; Check: IsWin64
 
-[Run]
-Filename: "{app}\{#AppExeName}"; Description: "Start {#AppName}"; Flags: nowait postinstall skipifsilent

@@ -12,6 +12,7 @@ public sealed class SequentialQueueProcessor(
     public async Task ProcessAllAsync(
         Action? onJobChanged = null,
         Action<QueueJob>? onJobProgress = null,
+        Func<QueueJob, string, TargetConflictResolution>? onTargetConflict = null,
         CancellationToken cancellationToken = default)
     {
         if (IsRunning)
@@ -41,13 +42,22 @@ public sealed class SequentialQueueProcessor(
 
                 try
                 {
-                    await processor.ProcessAsync(job, onJobProgress, cancellationToken);
+                    await processor.ProcessAsync(job, onJobProgress, onTargetConflict, cancellationToken);
                     job.Status = JobStatus.Completed;
                     job.TransferredBytes = job.TotalBytes;
                     job.BytesPerSecond = 0;
                     job.CurrentItem = string.Empty;
                     job.CompletedAt = DateTimeOffset.Now;
                     logger.JobCompleted(job);
+                }
+                catch (OperationSkippedException exception)
+                {
+                    job.Status = JobStatus.Skipped;
+                    job.CompletedAt = DateTimeOffset.Now;
+                    job.ErrorMessage = exception.Message;
+                    job.BytesPerSecond = 0;
+                    job.CurrentItem = string.Empty;
+                    logger.JobFailed(job, exception.Message);
                 }
                 catch (Exception exception) when (exception is not OperationCanceledException)
                 {

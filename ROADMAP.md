@@ -2,7 +2,7 @@
 
 Kopeeer should stay small, understandable, and Explorer-first. The path to `1.0` is not about adding many features. It is about making copy and move jobs feel reliable, clear, and boring in the best possible way.
 
-## Current Release: 0.3.0-alpha
+## Current Release: 0.5.0-beta
 
 The current alpha can already be installed and tested on Windows:
 
@@ -11,30 +11,21 @@ The current alpha can already be installed and tested on Windows:
   - `Move with Kopeeer`
 - Classic right-click fallback commands.
 - Sequential copy and move queue.
-- Compact transfer window with file name, progress, speed, upcoming jobs, and cancel.
+- Compact transfer window with file name, progress, transfer size, speed, upcoming jobs, and cancel.
+- Target conflict choices: rename, skip, or cancel queue.
 - Optional `Shut down when done`.
 - Self-contained installer with native Explorer shell extension.
 
-This is still an alpha. Use test files first.
+This is still a beta. Use test files first.
 
-## Next: 0.4.0-alpha
+## Next: 0.6.0-beta
 
-Focus: make failure cases obvious and safe.
+Focus: make the public page and everyday testing feel clearer.
 
-- Add a clear dialog or decision flow when the target file already exists.
-- Offer safe choices such as skip, rename, or cancel.
-- Improve cancellation for very large files and folders.
-- Show a clearer final state after a failed or canceled queue.
+- Add a short README GIF or screen recording.
+- Improve cancellation for very large folders.
 - Add a short troubleshooting section for Explorer integration.
-
-## Then: 0.5.0-beta
-
-Focus: make Kopeeer feel ready for everyday testing.
-
-- Add a tiny settings view for defaults.
-- Remember useful preferences such as shutdown behavior.
 - Improve wording across the app and installer.
-- Add screenshots or a short GIF to the README.
 - Test uninstall/reinstall/update flows on Windows 10 and Windows 11.
 - Decide whether the classic right-click fallback should stay enabled by default.
 
