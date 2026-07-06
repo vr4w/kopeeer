@@ -1,17 +1,31 @@
 # Kopeeer
 
-Kopeeer is a small Windows transfer queue for Explorer.
+Kopeeer is a small Windows transfer queue for Explorer copy and move jobs.
 
 It lets you right-drag files or folders onto a destination folder, choose `Copy with Kopeeer` or `Move with Kopeeer`, and then processes the jobs one after another in a compact transfer window.
 
 Status: `0.3.0-alpha`. Use test files first.
 
+## Install
+
+Download the latest installer from the GitHub Releases page:
+
+```text
+Kopeeer-Setup-0.3.0-alpha.exe
+```
+
+Run the installer and keep `Add Explorer context menu commands` enabled.
+
+Source code ZIP files do not contain the installer. Use the release asset instead.
+
+The installer asks for administrator approval because Windows Explorer loads the right-drag shell extension reliably when it is registered machine-wide.
+
 ## What Works
 
-- Right-drag Explorer menu:
+- Explorer right-drag menu commands:
   - `Copy with Kopeeer`
   - `Move with Kopeeer`
-- Classic right-click context menu commands for files and folders.
+- Classic right-click fallback commands for files and folders.
 - Sequential copy/move queue.
 - Compact transfer window with:
   - current file name
@@ -21,26 +35,14 @@ Status: `0.3.0-alpha`. Use test files first.
   - copy/move status per job
 - Windows dark-mode aware UI.
 - Optional `Shut down when done`.
-- Existing target files/folders are not overwritten silently.
+- Existing target files and folders are not overwritten silently.
 - Self-contained Windows build; no separate .NET runtime is required for the installed app.
-
-## Install
-
-Download and run:
-
-```text
-Kopeeer-Setup-0.3.0-alpha.exe
-```
-
-Keep `Add Explorer context menu commands` enabled.
-
-The installer needs administrator approval because Windows Explorer only loaded the right-drag shell extension reliably when it was registered machine-wide.
 
 ## Use
 
 Preferred workflow:
 
-1. In Explorer, drag one or more files/folders with the right mouse button.
+1. In Explorer, drag one or more files or folders with the right mouse button.
 2. Drop them onto a target folder.
 3. Choose `Copy with Kopeeer` or `Move with Kopeeer`.
 4. Watch progress in the small Kopeeer transfer window.
