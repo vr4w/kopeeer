@@ -6,17 +6,23 @@ It lets you right-drag files or folders onto a destination folder, choose `Copy 
 
 Status: `0.3.0-alpha`. Use test files first.
 
+## Download For Windows
+
+**[Download Kopeeer-Setup-0.3.0-alpha.exe](https://github.com/vr4w/kopeeer/releases/download/v0.3.0-alpha/Kopeeer-Setup-0.3.0-alpha.exe)**
+
+This is the installer for normal Windows use. Download it, run it, and keep `Add Explorer context menu commands` enabled.
+
+The files named `Source code` on GitHub are not the installer.
+
 ## Install
 
-Download the latest installer from the GitHub Releases page:
+If the direct download link above does not work, open the latest release and download the `.exe` file from there:
+
+**[Open Kopeeer Releases](https://github.com/vr4w/kopeeer/releases/latest)**
 
 ```text
 Kopeeer-Setup-0.3.0-alpha.exe
 ```
-
-Run the installer and keep `Add Explorer context menu commands` enabled.
-
-Source code ZIP files do not contain the installer. Use the release asset instead.
 
 The installer asks for administrator approval because Windows Explorer loads the right-drag shell extension reliably when it is registered machine-wide.
 
@@ -46,6 +52,7 @@ Preferred workflow:
 2. Drop them onto a target folder.
 3. Choose `Copy with Kopeeer` or `Move with Kopeeer`.
 4. Watch progress in the small Kopeeer transfer window.
+5. Use `Cancel` to stop the current queue and close the transfer window.
 
 Fallback workflow:
 
@@ -108,3 +115,13 @@ artifacts\installer\Kopeeer-Setup-0.3.0-alpha.exe
 Kopeeer is intentionally small. It is not a file manager, cloud sync tool, backup app, clipboard manager, or TeraCopy clone.
 
 The current Explorer integration is based on a native shell extension. Early experiments showed that left-drag modifier interception was not reliable on the tested Windows 11 Explorer path, while right-drag menu integration worked.
+
+## Road To 1.0
+
+Before Kopeeer should be called `1.0`, the main goal is reliability:
+
+- Clear overwrite/skip behavior when a target file already exists.
+- Better cancellation behavior for very large files and folders.
+- A small settings screen for defaults such as shutdown behavior.
+- Cleaner release notes and screenshots for non-technical users.
+- More real-world testing on Windows 10 and Windows 11.

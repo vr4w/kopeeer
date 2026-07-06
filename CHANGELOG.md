@@ -4,7 +4,36 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project intends to follow semantic versioning once releases begin.
 
-## 0.2.0-alpha - Unreleased
+## 0.3.0-alpha - 2026-07-06
+
+### Added
+
+- Native Explorer right-drag menu integration for:
+  - `Copy with Kopeeer`
+  - `Move with Kopeeer`
+- Compact transfer window with current file name, progress, speed, upcoming jobs, and cancel.
+- Optional `Shut down when done`.
+- First public GitHub release with installer asset.
+
+### Changed
+
+- Updated the app path lookup for the native shell extension.
+- Refined the transfer window to be smaller and more focused.
+- Improved README installation notes for the public alpha.
+
+### Fixed
+
+- Fixed shell extension app path lookup after installation.
+- Made cancel close the transfer window immediately.
+- Removed the visible error column from the main transfer window.
+
+### Known Risks
+
+- This is still an alpha release. Use test files first.
+- Existing target files and folders are not overwritten silently, but the user choice flow still needs polish.
+- Cancellation can still leave partial files depending on the exact operation Windows is performing at the moment of canceling.
+
+## 0.2.0-alpha - 2026-07-05
 
 ### Added
 

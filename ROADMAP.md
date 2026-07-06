@@ -1,100 +1,61 @@
 # Roadmap
 
-The project should grow in small, testable phases. Each phase should leave the tool understandable.
+Kopeeer should stay small, understandable, and Explorer-first. The path to `1.0` is not about adding many features. It is about making copy and move jobs feel reliable, clear, and boring in the best possible way.
 
-## Phase 0: Concept And Public Project Foundation
+## Current Release: 0.3.0-alpha
 
-- Define the core product boundary.
-- Compare Shell Extension and app architecture options.
-- Document risks before implementation.
-- Choose first repository structure.
-- Prepare public project files.
-- Keep product naming configurable while candidates are evaluated.
+The current alpha can already be installed and tested on Windows:
 
-## Phase 1: Queue Core And Local Worker
+- Explorer right-drag commands:
+  - `Copy with Kopeeer`
+  - `Move with Kopeeer`
+- Classic right-click fallback commands.
+- Sequential copy and move queue.
+- Compact transfer window with file name, progress, speed, upcoming jobs, and cancel.
+- Optional `Shut down when done`.
+- Self-contained installer with native Explorer shell extension.
 
-- Implement a local queue model.
-- Add one active job at a time.
-- Add pause, resume, cancel, and retry decisions where technically safe.
-- Add local worker boundaries.
-- Evaluate `IFileOperation` and fallback strategies.
-- Store settings locally.
-- Keep file-operation guarantees conservative until real Windows tests prove them.
-- Centralize user-facing strings so the app is localization-ready.
+This is still an alpha. Use test files first.
 
-Current status:
+## Next: 0.4.0-alpha
 
-- First queue model, JSON persistence, and local worker boundary are in place.
-- `Kopeeer.Core` and `Kopeeer.Worker` now provide the first manual alpha queue path.
-- Jobs run sequentially in memory.
-- First safe copy/move execution exists for manual alpha testing.
-- Existing targets fail instead of being overwritten.
-- Obsolete `FileOperationQueue.*` prototype projects have been removed from the build path.
+Focus: make failure cases obvious and safe.
 
-## Phase 2: Tray App / Minimal UI
+- Add a clear dialog or decision flow when the target file already exists.
+- Offer safe choices such as skip, rename, or cancel.
+- Improve cancellation for very large files and folders.
+- Show a clearer final state after a failed or canceled queue.
+- Add a short troubleshooting section for Explorer integration.
 
-- Build a minimal tray app with current job and pending jobs.
-- Add clear status labels.
-- Add queue controls only when they are technically safe.
-- Keep UI copy English-first and centralized.
-- Avoid dashboard-style complexity.
+## Then: 0.5.0-beta
 
-Current status:
+Focus: make Kopeeer feel ready for everyday testing.
 
-- First Windows Forms tray UI scaffold is in place.
-- A plain runnable WinForms alpha app exists under `src/Kopeeer.App`.
-- Manual file/folder source selection, target selection, copy/move selection, queue display, and queue start are in place.
-- It writes a test log to `logs/kopeeer.log`.
-- Buttons now enable only when the current action is valid.
-- The queue table and status summary are more readable.
-- Windows runtime verification is still required.
+- Add a tiny settings view for defaults.
+- Remember useful preferences such as shutdown behavior.
+- Improve wording across the app and installer.
+- Add screenshots or a short GIF to the README.
+- Test uninstall/reinstall/update flows on Windows 10 and Windows 11.
+- Decide whether the classic right-click fallback should stay enabled by default.
 
-## Phase 3: Explorer Context Menu Integration
+## Before 1.0
 
-- Add explicit Explorer commands:
-  - "Copy with Kopeeer..."
-  - "Move with Kopeeer..."
-  - "Add to Kopeeer queue..."
-- Pass selected items and target folder to the app or worker.
-- Keep the Shell Extension small and defensive.
-- Validate registration and uninstallation on Windows 10 and Windows 11.
-- Treat this as the first production Explorer integration path.
+Focus: reliability, trust, and a simple first-user experience.
 
-Current status:
+- Confirm copy and move behavior with folders, many files, large files, and removable drives.
+- Confirm behavior on network paths and long paths, or document limitations clearly.
+- Make logs useful without exposing confusing internal details.
+- Add release checks so every installer is built the same way.
+- Decide whether code signing is required before wider public use.
+- Keep the first screen and README focused on download, install, and use.
 
-- App command-line queue entry points are in place for context menu handoff.
-- Reversible current-user registry dev scripts are in place.
-- Draft Inno Setup installer registration is in place.
-- Windows verification is required before this becomes a release feature.
+## Not Planned For 1.0
 
-## Phase 4: Drag-and-drop / Shell Integration Research
+These ideas may be useful later, but they should not distract the first stable release:
 
-- Research the safest Shell mechanism for the modifier-based drop workflow.
-- Prototype modifier detection such as `ALT + SHIFT`.
-- Confirm whether the app can reliably take over a drop without breaking normal Explorer behavior.
-- Assume this belongs after 0.1 unless the prototype is exceptionally clean.
-- Do not ship a production-ready Explorer hook until stability is proven.
-
-Current status:
-
-- Prototype requirements and Windows test checklist are documented.
-- No native drop hook is installed by default.
-
-## Phase 5: Installer And Release Packaging
-
-- Evaluate WiX Toolset and Inno Setup.
-- Register and unregister Shell Extension components cleanly.
-- Offer installer options for Explorer integration.
-- Add release signing plan.
-- Keep the version 0.1 installer English only, with clear Explorer integration wording.
-- Build first public alpha release.
-
-## Phase 6: Conflict Handling, Logs, Polish, Localization
-
-- Improve conflict handling for existing files.
-- Add clear, local-only logs.
-- Add favorite target folders.
-- Add better error recovery.
-- Add future localization support if the centralized string model is ready.
-- Refine wording, icons, and empty states.
-- Keep the UI quiet.
+- Full file manager features.
+- Cloud sync.
+- Backup scheduling.
+- Clipboard history.
+- Complex transfer dashboards.
+- Left-drag modifier interception, unless a reliable Windows Explorer path is proven.
