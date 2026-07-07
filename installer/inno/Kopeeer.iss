@@ -2,7 +2,7 @@
 ; Build on Windows through scripts\build-installer.ps1.
 
 #ifndef AppVersion
-#define AppVersion "0.5.0-beta"
+#define AppVersion "1.0.0"
 #endif
 
 #ifndef PublishDir
@@ -44,6 +44,7 @@ ArchitecturesAllowed=x64compatible
 PrivilegesRequired=admin
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayIcon={app}\{#AppExeName}
+CloseApplications=no
 
 [Messages]
 WelcomeLabel1=Install Kopeeer
@@ -53,7 +54,7 @@ FinishedLabel=Kopeeer is ready in Windows Explorer. Right-drag files or folders 
 
 [Files]
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#DropHandlerDir}\Kopeeer.ShellExtension.dll"; DestDir: "{app}\Shell"; Flags: ignoreversion
+Source: "{#DropHandlerDir}\Kopeeer.ShellExtension.dll"; DestDir: "{app}\Shell\{#AppVersion}"; Flags: ignoreversion
 
 [Tasks]
 Name: "explorercontext"; Description: "Add Kopeeer to Explorer right-drag menus"; GroupDescription: "Windows Explorer integration:"; Flags: checkedonce
@@ -77,7 +78,7 @@ Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith\command";
 
 Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueType: string; ValueName: ""; ValueData: "Kopeeer Right-Drag Menu"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
 Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueType: string; ValueName: "AppPath"; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
-Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: ""; ValueData: "{app}\Shell\Kopeeer.ShellExtension.dll"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
+Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: ""; ValueData: "{app}\Shell\{#AppVersion}\Kopeeer.ShellExtension.dll"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
 Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: "ThreadingModel"; ValueData: "Apartment"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
 Root: HKLM; Subkey: "Software\Classes\Directory\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
 Root: HKLM; Subkey: "Software\Classes\Folder\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64

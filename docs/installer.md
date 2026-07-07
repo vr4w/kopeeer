@@ -2,41 +2,28 @@
 
 The project needs an installer because deep Windows integration must be registered and removed cleanly.
 
-## Recommended Installer Direction
+## Installer Direction
 
-Evaluate WiX Toolset and Inno Setup for the first serious Windows installer.
+Kopeeer currently uses Inno Setup. The installer should feel like a small Windows utility installer: install it once, keep the Explorer integration enabled, then forget about the app until a transfer starts.
 
-WiX strengths:
+The installer should not launch Kopeeer at the end. Kopeeer is started by Explorer when the user chooses `Copy with Kopeeer` or `Move with Kopeeer`.
 
-- Good fit for MSI-based Windows installation.
-- Handles registry entries and component ownership explicitly.
-- Can model upgrades and uninstallation.
-- Suitable for Shell Extension registration when authored carefully.
-- More appropriate for this project than a quick archive-based release because Explorer integration must be reversible.
-
-Inno Setup strengths:
-
-- Simpler authoring model.
-- Friendly for small Windows utilities.
-- Good candidate if the first installer does not need complex MSI behavior.
-- Good first candidate for current-user context menu registration while the native Shell Extension remains unproven.
-
-The final choice should be based on registration reliability, uninstall cleanliness, upgrade behavior, and how clearly the installer can explain Explorer integration.
+The installer choice can be revisited later if MSI-style upgrade management becomes necessary, but it should not block the first stable release.
 
 Current repository state:
 
-- `installer/inno/Kopeeer.iss` is a draft Inno Setup script.
+- `installer/inno/Kopeeer.iss` is the active Inno Setup script.
 - `scripts/build-installer.ps1` publishes the app and builds the installer EXE on Windows.
 - It installs the app from `artifacts\publish\Kopeeer.App`.
 - It writes the installer to `artifacts\installer`.
-- It installs into the current user's local app folder and should not require admin rights.
-- It can register current-user context menu commands for files and folders through the installer option `Add Explorer context menu commands`.
+- It installs into `Program Files` and requires administrator approval.
+- It registers the native Explorer right-drag Shell Extension machine-wide.
+- It also registers classic right-click fallback commands for files and folders.
 - It uses separate copy and cut icon assets for the Explorer menu entries.
-- It does not install a native Shell Extension or drag-and-drop hook.
-- The current alpha context menu registration is tested first through `scripts/register-context-menu.ps1` and `scripts/unregister-context-menu.ps1`.
-- GitHub Actions can build the installer as an artifact, and tagged builds can publish a prerelease.
+- It does not start Kopeeer after installation.
+- It installs the Explorer Shell Extension into a versioned folder so upgrades do not have to close Explorer just to replace a loaded DLL.
 
-## Build Current Alpha Installer
+## Build Installer
 
 Requirements:
 
@@ -53,7 +40,7 @@ scripts\build-installer.ps1
 Optional custom version:
 
 ```powershell
-scripts\build-installer.ps1 -Version "0.2.0-alpha"
+scripts\build-installer.ps1 -Version "1.0.0"
 ```
 
 Optional custom Inno Setup compiler path:
@@ -65,43 +52,35 @@ scripts\build-installer.ps1 -InnoCompilerPath "C:\Path\To\ISCC.exe"
 Expected output:
 
 ```text
-artifacts\installer\Kopeeer-Setup-0.2.0-alpha.exe
+artifacts\installer\Kopeeer-Setup-1.0.0.exe
 ```
 
-This installer is still an alpha packaging test. It is useful for validating install, uninstall, and context menu behavior before deeper Windows integration is attempted.
+Before publishing a release, install the generated EXE on a Windows test machine and confirm Explorer copy/move behavior, upgrade behavior, and uninstall cleanup.
 
 ## Installer Goals
 
-- Install the app and worker.
-- Optionally register Explorer integration.
+- Install the app.
 - Register 64-bit Shell Extension components.
-- Add start menu entry if useful.
-- Optionally start the app with Windows.
+- Register Explorer menu entries.
+- Avoid closing Explorer during normal install and upgrade.
 - Cleanly unregister everything on uninstall.
 - Make integration choices visible instead of silently modifying Explorer.
 
 ## Installer Options
 
-Initial options:
+Current option:
 
-- Install tray app and worker.
-- Enable Explorer context menu integration.
-- Enable experimental drag-and-drop integration only when it is proven and clearly marked.
-- Start the app after install.
-- Start the app with Windows.
-
-The drag-and-drop hook must remain opt-in and experimental until validated on Windows 10 and Windows 11.
+- Add Kopeeer to Explorer right-drag menus.
 
 ## Language Strategy
 
-Version 0.1 installer text should be English only.
+The installer text is English only for now.
 
 The installer should clearly explain:
 
 - What Explorer integration means.
 - Which context menu entries will be added.
-- Which shortcuts or modifier workflows are available, if any.
-- Whether the app will start with Windows.
+- That no separate app window needs to stay open.
 - How Explorer integration can be removed again.
 
 Future multilingual installer support can be added later, but it should not complicate the first release.
@@ -110,16 +89,15 @@ Future multilingual installer support can be added later, but it should not comp
 
 Uninstall must:
 
-- Stop the app and worker.
+- Stop the app if it is running.
 - Unregister Shell Extensions.
 - Remove context menu entries.
-- Remove scheduled startup entry if used.
-- Leave user logs/settings only if the user chooses to keep them.
+- Leave no stale Explorer menu entries after Explorer is restarted.
 
 ## Risks
 
-- Explorer may keep Shell Extension DLLs loaded.
-- Uninstall may require Explorer restart, sign-out, or reboot.
+- Explorer may keep old Shell Extension DLLs loaded until Explorer is restarted.
+- Uninstall may require Explorer restart, sign-out, or reboot to release an already-loaded DLL.
 - Broken registration can leave stale menu entries.
 - Windows 10 and Windows 11 behavior must both be tested.
 
@@ -127,7 +105,7 @@ Uninstall must:
 
 A public release should eventually be code-signed.
 
-Unsigned Shell Extensions and installers can look alarming and may reduce trust. Signing is not required for the concept phase, but it should be planned before broad public distribution.
+Unsigned Shell Extensions and installers can look alarming and may reduce trust. Signing is not required for the first stable release, but it should be planned before broader public distribution.
 
 ## References
 

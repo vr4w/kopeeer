@@ -4,11 +4,11 @@ Kopeeer is a small Windows transfer queue for Explorer copy and move jobs.
 
 It lets you right-drag files or folders onto a destination folder, choose `Copy with Kopeeer` or `Move with Kopeeer`, and then processes the jobs one after another in a compact transfer window.
 
-Status: `0.5.0-beta`. Use test files first.
+Status: `1.0.0`.
 
 ## Download For Windows
 
-**[Download Kopeeer-Setup-0.5.0-beta.exe](https://github.com/vr4w/kopeeer/releases/download/v0.5.0-beta/Kopeeer-Setup-0.5.0-beta.exe)**
+**[Download Kopeeer-Setup-1.0.0.exe](https://github.com/vr4w/kopeeer/releases/download/v1.0.0/Kopeeer-Setup-1.0.0.exe)**
 
 This is the installer for normal Windows use. Download it, run it, and keep `Add Explorer context menu commands` enabled.
 
@@ -21,7 +21,7 @@ If the direct download link above does not work, open the latest release and dow
 **[Open Kopeeer Releases](https://github.com/vr4w/kopeeer/releases/latest)**
 
 ```text
-Kopeeer-Setup-0.5.0-beta.exe
+Kopeeer-Setup-1.0.0.exe
 ```
 
 The installer asks for administrator approval because Windows Explorer loads the right-drag shell extension reliably when it is registered machine-wide.
@@ -99,7 +99,7 @@ scripts\build-installer.ps1
 Expected output:
 
 ```text
-artifacts\installer\Kopeeer-Setup-0.5.0-beta.exe
+artifacts\installer\Kopeeer-Setup-1.0.0.exe
 ```
 
 ## Repository Shape
@@ -120,10 +120,14 @@ The current Explorer integration is based on a native shell extension. Early exp
 
 ## Road To 1.0
 
-Before Kopeeer should be called `1.0`, the main goal is reliability:
+Kopeeer `1.0.0` is the first stable Explorer-first release. Future work should stay focused on reliability, clearer troubleshooting, and broader Windows testing.
 
-- More testing of overwrite/skip/rename behavior when a target file already exists.
-- Better cancellation behavior for very large folders.
-- A small settings screen for defaults such as shutdown behavior.
-- Cleaner release notes and screenshots for non-technical users.
-- More real-world testing on Windows 10 and Windows 11.
+For major changes, test copy, move, conflict handling, cancellation, uninstall, and reinstall before publishing a new release.
+
+## Troubleshooting
+
+If the Explorer menu does not appear after installing, restart Explorer or sign out and back in once.
+
+If Windows shows only the normal copy menu, make sure you are dragging with the right mouse button, then drop onto a folder and choose `Copy with Kopeeer` or `Move with Kopeeer`.
+
+If Kopeeer opens but does not copy, uninstall Kopeeer, install the latest `.exe` from the release page again, and retry with a small test file first.

@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project intends to follow semantic versioning once releases begin.
 
+## Unreleased
+
+No unreleased changes.
+
+## 1.0.0 - 2026-07-07
+
+### Changed
+
+- Promoted Kopeeer to the first stable Explorer-first release.
+- Updated README, roadmap, installer notes, and release text for `1.0.0`.
+- Reworked the roadmap around recurring release checks instead of a beta-to-1.0 checklist.
+- Removed the confusing intermediate beta placeholder and simplified the stable-release scope notes.
+- Updated installer documentation to match the current machine-wide Explorer integration.
+- Changed installer shell-extension placement so upgrades no longer need to close Explorer just to replace the loaded DLL.
+
 ## 0.5.0-beta - 2026-07-07
 
 ### Added
