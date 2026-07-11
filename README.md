@@ -1,10 +1,16 @@
 # Kopeeer
 
-Kopeeer is a small Windows transfer queue for Explorer copy and move jobs.
+Kopeeer is a small Windows utility that queues copy and move operations from File Explorer and processes them one after another.
 
 It lets you right-drag files or folders onto a destination folder, choose `Copy with Kopeeer` or `Move with Kopeeer`, and then processes the jobs one after another in a compact transfer window.
 
 Status: `1.0.0`.
+
+**[Download Kopeeer-Setup-1.0.0.exe](https://github.com/vr4w/kopeeer/releases/download/v1.0.0/Kopeeer-Setup-1.0.0.exe)**
+
+Release page: [Kopeeer 1.0.0](https://github.com/vr4w/kopeeer/releases/tag/v1.0.0)
+
+![Kopeeer queuing multiple Windows Explorer file transfers](docs/assets/kopeeer-demo.gif)
 
 ## Download For Windows
 
@@ -12,7 +18,7 @@ Status: `1.0.0`.
 
 This is the installer for normal Windows use. Download it, run it, and keep `Add Explorer context menu commands` enabled.
 
-The files named `Source code` on GitHub are not the installer.
+Source code ZIPs do not contain the installer. Download the installer from the [GitHub Releases page](https://github.com/vr4w/kopeeer/releases/latest).
 
 ## Install
 
@@ -131,3 +137,15 @@ If the Explorer menu does not appear after installing, restart Explorer or sign 
 If Windows shows only the normal copy menu, make sure you are dragging with the right mouse button, then drop onto a folder and choose `Copy with Kopeeer` or `Move with Kopeeer`.
 
 If Kopeeer opens but does not copy, uninstall Kopeeer, install the latest `.exe` from the release page again, and retry with a small test file first.
+
+## License
+
+Kopeeer is open source under the [MIT License](LICENSE).
+
+## Support
+
+Kopeeer is free to use.
+
+If Kopeeer saves you time or makes Windows file transfers a little less annoying, you can support the project here:
+
+Buy me a coffee: [paypal.me/ALMOSTEVERYTHINGMS](https://www.paypal.com/paypalme/my/profile)
