@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using Kopeeer.Core;
 using Kopeeer.Worker;
@@ -8,6 +10,11 @@ namespace Kopeeer.App;
 
 public sealed class MainForm : Form
 {
+    private const int BorderRadius = 8;
+    private const int WmNclButtonDown = 0x00A1;
+    private const int HtCaption = 0x02;
+    private const int CsDropShadow = 0x00020000;
+
     private static readonly bool IsDarkMode = DetectWindowsDarkMode();
     private static readonly Color WindowBackground = IsDarkMode ? Color.FromArgb(24, 24, 27) : Color.FromArgb(246, 247, 249);
     private static readonly Color PanelBackground = IsDarkMode ? Color.FromArgb(32, 33, 36) : Color.White;
@@ -30,6 +37,7 @@ public sealed class MainForm : Form
     private readonly Button _clearCompletedButton = new();
     private readonly Button _manualButton = new();
     private readonly Button _cancelButton = new();
+    private readonly Button _windowCloseButton = new();
     private readonly CheckBox _shutdownWhenDoneCheckBox = new();
     private readonly Label _statusLabel = new();
     private readonly Label _summaryLabel = new();
@@ -51,11 +59,12 @@ public sealed class MainForm : Form
     {
         Text = "Kopeeer";
         StartPosition = FormStartPosition.CenterScreen;
-        FormBorderStyle = FormBorderStyle.FixedSingle;
+        FormBorderStyle = FormBorderStyle.None;
         MaximizeBox = false;
-        ClientSize = new Size(444, 178);
+        ClientSize = new Size(444, 198);
         BackColor = WindowBackground;
         Font = new Font("Segoe UI", 9F);
+        Padding = new Padding(1);
 
         _logger = new FileJobLogger(Path.Combine(Directory.GetCurrentDirectory(), "logs", "kopeeer.log"));
         _queueProcessor = new SequentialQueueProcessor(_queue, new FileOperationProcessor(), _logger);
@@ -75,42 +84,48 @@ public sealed class MainForm : Form
         {
             Dock = DockStyle.Fill,
             ColumnCount = 1,
-            RowCount = 3,
-            Padding = new Padding(10),
+            RowCount = 4,
+            Padding = new Padding(10, 6, 10, 10),
             BackColor = WindowBackground
         };
 
+        root.RowStyles.Add(new RowStyle(SizeType.Absolute, 24));
         root.RowStyles.Add(new RowStyle(SizeType.Absolute, 92));
         root.RowStyles.Add(_queueRowStyle);
         root.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
 
-        root.Controls.Add(BuildTransferPanel(), 0, 0);
-        root.Controls.Add(BuildQueueArea(), 0, 1);
-        root.Controls.Add(BuildActions(), 0, 2);
+        root.Controls.Add(BuildWindowChrome(), 0, 0);
+        root.Controls.Add(BuildTransferPanel(), 0, 1);
+        root.Controls.Add(BuildQueueArea(), 0, 2);
+        root.Controls.Add(BuildActions(), 0, 3);
 
         return root;
     }
 
-    private Control BuildHeader()
+    private Control BuildWindowChrome()
     {
         var panel = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
-            ColumnCount = 2,
+            ColumnCount = 3,
             RowCount = 1,
-            BackColor = WindowBackground
+            BackColor = WindowBackground,
+            Cursor = Cursors.Default,
+            Margin = new Padding(0, 0, 0, 2)
         };
 
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 170));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 140));
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 30));
 
         panel.Controls.Add(new Label
         {
             Dock = DockStyle.Fill,
-            Font = new Font(Font.FontFamily, 13F, FontStyle.Bold),
+            Font = new Font(Font.FontFamily, 8.5F, FontStyle.Regular),
             ForeColor = TextPrimary,
             Text = "Kopeeer",
-            TextAlign = ContentAlignment.MiddleLeft
+            TextAlign = ContentAlignment.MiddleLeft,
+            Cursor = Cursors.Default
         }, 0, 0);
 
         _summaryLabel.Dock = DockStyle.Fill;
@@ -118,7 +133,106 @@ public sealed class MainForm : Form
         _summaryLabel.TextAlign = ContentAlignment.MiddleRight;
         panel.Controls.Add(_summaryLabel, 1, 0);
 
+        StyleWindowCloseButton();
+        panel.Controls.Add(_windowCloseButton, 2, 0);
+
+        panel.MouseDown += BeginWindowDrag;
+        foreach (Control control in panel.Controls)
+        {
+            if (control != _windowCloseButton)
+            {
+                control.MouseDown += BeginWindowDrag;
+            }
+        }
+
         return panel;
+    }
+
+    protected override CreateParams CreateParams
+    {
+        get
+        {
+            var createParams = base.CreateParams;
+            createParams.ClassStyle |= CsDropShadow;
+            return createParams;
+        }
+    }
+
+    protected override void OnResize(EventArgs e)
+    {
+        base.OnResize(e);
+        ApplyRoundedRegion();
+        Invalidate();
+    }
+
+    protected override void OnPaint(PaintEventArgs e)
+    {
+        base.OnPaint(e);
+        using var borderPen = new Pen(Border);
+        var borderBounds = new Rectangle(0, 0, ClientSize.Width - 1, ClientSize.Height - 1);
+        using var path = CreateRoundedRectanglePath(borderBounds, BorderRadius);
+        e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        e.Graphics.DrawPath(borderPen, path);
+    }
+
+    private void ApplyRoundedRegion()
+    {
+        if (ClientSize.Width <= 0 || ClientSize.Height <= 0)
+        {
+            return;
+        }
+
+        Region?.Dispose();
+        using var path = CreateRoundedRectanglePath(new Rectangle(Point.Empty, ClientSize), BorderRadius);
+        Region = new Region(path);
+    }
+
+    private static GraphicsPath CreateRoundedRectanglePath(Rectangle bounds, int radius)
+    {
+        var diameter = radius * 2;
+        var path = new GraphicsPath();
+        path.AddArc(bounds.Left, bounds.Top, diameter, diameter, 180, 90);
+        path.AddArc(bounds.Right - diameter, bounds.Top, diameter, diameter, 270, 90);
+        path.AddArc(bounds.Right - diameter, bounds.Bottom - diameter, diameter, diameter, 0, 90);
+        path.AddArc(bounds.Left, bounds.Bottom - diameter, diameter, diameter, 90, 90);
+        path.CloseFigure();
+        return path;
+    }
+
+    private void BeginWindowDrag(object? sender, MouseEventArgs e)
+    {
+        if (e.Button != MouseButtons.Left)
+        {
+            return;
+        }
+
+        ReleaseCapture();
+        SendMessage(Handle, WmNclButtonDown, HtCaption, 0);
+    }
+
+    private void StyleWindowCloseButton()
+    {
+        _windowCloseButton.Text = "×";
+        _windowCloseButton.Dock = DockStyle.Fill;
+        _windowCloseButton.Font = new Font(Font.FontFamily, 10F, FontStyle.Regular);
+        _windowCloseButton.FlatStyle = FlatStyle.Flat;
+        _windowCloseButton.FlatAppearance.BorderSize = 0;
+        _windowCloseButton.BackColor = WindowBackground;
+        _windowCloseButton.ForeColor = TextMuted;
+        _windowCloseButton.Margin = new Padding(5, 0, 0, 2);
+        _windowCloseButton.Cursor = Cursors.Hand;
+        _windowCloseButton.MouseEnter += (_, _) => _windowCloseButton.ForeColor = TextPrimary;
+        _windowCloseButton.MouseLeave += (_, _) => _windowCloseButton.ForeColor = TextMuted;
+        _windowCloseButton.Click += (_, _) =>
+        {
+            if (_queueProcessor.IsRunning)
+            {
+                CancelQueue();
+                return;
+            }
+
+            Close();
+        };
     }
 
     private Control BuildActions()
@@ -657,7 +771,7 @@ public sealed class MainForm : Form
 
     private void ResizeQueueArea(int pendingCount)
     {
-        const int baseClientHeight = 142;
+        const int baseClientHeight = 164;
         const int rowHeight = 23;
         const int maxVisibleRows = 5;
 
@@ -945,6 +1059,12 @@ public sealed class MainForm : Form
             return false;
         }
     }
+
+    [DllImport("user32.dll")]
+    private static extern bool ReleaseCapture();
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr SendMessage(IntPtr hWnd, int message, int wParam, int lParam);
 
     public Task ApplyExternalQueueRequestAsync(StartupQueueRequest request)
     {

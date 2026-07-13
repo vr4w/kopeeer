@@ -6,7 +6,9 @@ The format is based on Keep a Changelog, and this project intends to follow sema
 
 ## Unreleased
 
-No unreleased changes.
+### Changed
+
+- Replaced the standard Windows transfer-window frame with a compact borderless window style.
 
 ## 1.0.0 - 2026-07-07
 
