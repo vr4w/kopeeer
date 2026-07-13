@@ -63,37 +63,37 @@ Source: "..\..\scripts\diagnose-installation.ps1"; DestDir: "{app}\Tools"; Flags
 Source: "..\..\scripts\repair-shell-integration.ps1"; DestDir: "{app}\Tools"; Flags: ignoreversion
 
 [Registry]
-Root: HKLM; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "InstallDir"; ValueData: "{app}"; Flags: uninsdeletekey 64bit
-Root: HKLM; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "AppPath"; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey 64bit
-Root: HKLM; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "ShellExtensionPath"; ValueData: "{app}\Shell\{#AppVersion}\{#ShellExtensionName}"; Flags: uninsdeletekey 64bit
-Root: HKLM; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "Version"; ValueData: "{#AppVersion}"; Flags: uninsdeletekey 64bit
-Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\App Paths\{#AppExeName}"; ValueType: string; ValueName: ""; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey 64bit
-Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\App Paths\{#AppExeName}"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Flags: uninsdeletekey 64bit
+Root: HKLM64; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "InstallDir"; ValueData: "{app}"; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "AppPath"; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "ShellExtensionPath"; ValueData: "{app}\Shell\{#AppVersion}\{#ShellExtensionName}"; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "Version"; ValueData: "{#AppVersion}"; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Microsoft\Windows\CurrentVersion\App Paths\{#AppExeName}"; ValueType: string; ValueName: ""; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Microsoft\Windows\CurrentVersion\App Paths\{#AppExeName}"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Flags: uninsdeletekey
 
-Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Copy with Kopeeer..."; Flags: uninsdeletekey 64bit
-Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\copy.ico"; Flags: uninsdeletekey 64bit
-Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.CopyWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation copy --pick-target --sources ""%1"""; Flags: uninsdeletekey 64bit
+Root: HKLM64; Subkey: "Software\Classes\*\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Copy with Kopeeer..."; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Classes\*\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\copy.ico"; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Classes\*\shell\Kopeeer.CopyWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation copy --pick-target --sources ""%1"""; Flags: uninsdeletekey
 
-Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Move with Kopeeer..."; Flags: uninsdeletekey 64bit
-Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\cut.ico"; Flags: uninsdeletekey 64bit
-Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.MoveWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation move --pick-target --sources ""%1"""; Flags: uninsdeletekey 64bit
+Root: HKLM64; Subkey: "Software\Classes\*\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Move with Kopeeer..."; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Classes\*\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\cut.ico"; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Classes\*\shell\Kopeeer.MoveWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation move --pick-target --sources ""%1"""; Flags: uninsdeletekey
 
-Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Copy with Kopeeer..."; Flags: uninsdeletekey 64bit
-Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\copy.ico"; Flags: uninsdeletekey 64bit
-Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.CopyWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation copy --pick-target --sources ""%1"""; Flags: uninsdeletekey 64bit
+Root: HKLM64; Subkey: "Software\Classes\Directory\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Copy with Kopeeer..."; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Classes\Directory\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\copy.ico"; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Classes\Directory\shell\Kopeeer.CopyWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation copy --pick-target --sources ""%1"""; Flags: uninsdeletekey
 
-Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Move with Kopeeer..."; Flags: uninsdeletekey 64bit
-Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\cut.ico"; Flags: uninsdeletekey 64bit
-Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation move --pick-target --sources ""%1"""; Flags: uninsdeletekey 64bit
+Root: HKLM64; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Move with Kopeeer..."; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\cut.ico"; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation move --pick-target --sources ""%1"""; Flags: uninsdeletekey
 
-Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueType: string; ValueName: ""; ValueData: "Kopeeer Right-Drag Menu"; Flags: uninsdeletekey 64bit; Check: IsWin64
-Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueType: string; ValueName: "AppPath"; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey 64bit; Check: IsWin64
-Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: ""; ValueData: "{app}\Shell\{#AppVersion}\{#ShellExtensionName}"; Flags: uninsdeletekey 64bit; Check: IsWin64
-Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: "ThreadingModel"; ValueData: "Apartment"; Flags: uninsdeletekey 64bit; Check: IsWin64
-Root: HKLM; Subkey: "Software\Classes\Directory\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey 64bit; Check: IsWin64
-Root: HKLM; Subkey: "Software\Classes\Folder\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey 64bit; Check: IsWin64
-Root: HKLM; Subkey: "Software\Classes\Drive\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey 64bit; Check: IsWin64
-Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved"; ValueType: string; ValueName: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueData: "Kopeeer Right-Drag Menu"; Flags: uninsdeletevalue 64bit; Check: IsWin64
+Root: HKLM64; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueType: string; ValueName: ""; ValueData: "Kopeeer Right-Drag Menu"; Flags: uninsdeletekey; Check: IsWin64
+Root: HKLM64; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueType: string; ValueName: "AppPath"; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey; Check: IsWin64
+Root: HKLM64; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: ""; ValueData: "{app}\Shell\{#AppVersion}\{#ShellExtensionName}"; Flags: uninsdeletekey; Check: IsWin64
+Root: HKLM64; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: "ThreadingModel"; ValueData: "Apartment"; Flags: uninsdeletekey; Check: IsWin64
+Root: HKLM64; Subkey: "Software\Classes\Directory\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey; Check: IsWin64
+Root: HKLM64; Subkey: "Software\Classes\Folder\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey; Check: IsWin64
+Root: HKLM64; Subkey: "Software\Classes\Drive\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey; Check: IsWin64
+Root: HKLM64; Subkey: "Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved"; ValueType: string; ValueName: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueData: "Kopeeer Right-Drag Menu"; Flags: uninsdeletevalue; Check: IsWin64
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\Assets\{#AppIconName}"
