@@ -2,7 +2,7 @@
 ; Build on Windows through scripts\build-installer.ps1.
 
 #ifndef AppVersion
-#define AppVersion "1.0.0"
+#define AppVersion "1.0.1"
 #endif
 
 #ifndef PublishDir
@@ -20,6 +20,9 @@
 #define AppName "Kopeeer"
 #define AppPublisher "vr4w"
 #define AppExeName "Kopeeer.App.exe"
+#define AppIconName "app.ico"
+#define ShellExtensionName "Kopeeer.ShellExtension.dll"
+#define DragDropMenuClassId "{A9D60874-04A4-4962-8798-69D186A6E5E6}"
 #define AppUrl "https://github.com/vr4w/kopeeer"
 
 [Setup]
@@ -38,12 +41,13 @@ DisableProgramGroupPage=yes
 WizardStyle=modern
 OutputDir={#OutputDir}
 OutputBaseFilename=Kopeeer-Setup-{#AppVersion}
+SetupIconFile=..\..\src\Kopeeer.App\Assets\{#AppIconName}
 Compression=lzma
 SolidCompression=yes
 ArchitecturesAllowed=x64compatible
 PrivilegesRequired=admin
 ArchitecturesInstallIn64BitMode=x64compatible
-UninstallDisplayIcon={app}\{#AppExeName}
+UninstallDisplayIcon={app}\Assets\{#AppIconName}
 CloseApplications=no
 
 [Messages]
@@ -54,34 +58,120 @@ FinishedLabel=Kopeeer is ready in Windows Explorer. Right-drag files or folders 
 
 [Files]
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#DropHandlerDir}\Kopeeer.ShellExtension.dll"; DestDir: "{app}\Shell\{#AppVersion}"; Flags: ignoreversion
-
-[Tasks]
-Name: "explorercontext"; Description: "Add Kopeeer to Explorer right-drag menus"; GroupDescription: "Windows Explorer integration:"; Flags: checkedonce
+Source: "{#DropHandlerDir}\{#ShellExtensionName}"; DestDir: "{app}\Shell\{#AppVersion}"; Flags: ignoreversion
+Source: "..\..\scripts\diagnose-installation.ps1"; DestDir: "{app}\Tools"; Flags: ignoreversion
+Source: "..\..\scripts\repair-shell-integration.ps1"; DestDir: "{app}\Tools"; Flags: ignoreversion
 
 [Registry]
-Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Copy with Kopeeer..."; Flags: uninsdeletekey; Tasks: explorercontext
-Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\copy.ico"; Flags: uninsdeletekey; Tasks: explorercontext
-Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.CopyWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation copy --pick-target --sources ""%1"""; Flags: uninsdeletekey; Tasks: explorercontext
+Root: HKLM; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "InstallDir"; ValueData: "{app}"; Flags: uninsdeletekey 64bit
+Root: HKLM; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "AppPath"; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey 64bit
+Root: HKLM; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "ShellExtensionPath"; ValueData: "{app}\Shell\{#AppVersion}\{#ShellExtensionName}"; Flags: uninsdeletekey 64bit
+Root: HKLM; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "Version"; ValueData: "{#AppVersion}"; Flags: uninsdeletekey 64bit
+Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\App Paths\{#AppExeName}"; ValueType: string; ValueName: ""; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey 64bit
+Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\App Paths\{#AppExeName}"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Flags: uninsdeletekey 64bit
 
-Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Move with Kopeeer..."; Flags: uninsdeletekey; Tasks: explorercontext
-Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\cut.ico"; Flags: uninsdeletekey; Tasks: explorercontext
-Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.MoveWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation move --pick-target --sources ""%1"""; Flags: uninsdeletekey; Tasks: explorercontext
+Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Copy with Kopeeer..."; Flags: uninsdeletekey 64bit
+Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\copy.ico"; Flags: uninsdeletekey 64bit
+Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.CopyWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation copy --pick-target --sources ""%1"""; Flags: uninsdeletekey 64bit
 
-Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Copy with Kopeeer..."; Flags: uninsdeletekey; Tasks: explorercontext
-Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\copy.ico"; Flags: uninsdeletekey; Tasks: explorercontext
-Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.CopyWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation copy --pick-target --sources ""%1"""; Flags: uninsdeletekey; Tasks: explorercontext
+Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Move with Kopeeer..."; Flags: uninsdeletekey 64bit
+Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\cut.ico"; Flags: uninsdeletekey 64bit
+Root: HKLM; Subkey: "Software\Classes\*\shell\Kopeeer.MoveWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation move --pick-target --sources ""%1"""; Flags: uninsdeletekey 64bit
 
-Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Move with Kopeeer..."; Flags: uninsdeletekey; Tasks: explorercontext
-Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\cut.ico"; Flags: uninsdeletekey; Tasks: explorercontext
-Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation move --pick-target --sources ""%1"""; Flags: uninsdeletekey; Tasks: explorercontext
+Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Copy with Kopeeer..."; Flags: uninsdeletekey 64bit
+Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.CopyWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\copy.ico"; Flags: uninsdeletekey 64bit
+Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.CopyWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation copy --pick-target --sources ""%1"""; Flags: uninsdeletekey 64bit
 
-Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueType: string; ValueName: ""; ValueData: "Kopeeer Right-Drag Menu"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
-Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueType: string; ValueName: "AppPath"; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
-Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: ""; ValueData: "{app}\Shell\{#AppVersion}\Kopeeer.ShellExtension.dll"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
-Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: "ThreadingModel"; ValueData: "Apartment"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
-Root: HKLM; Subkey: "Software\Classes\Directory\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
-Root: HKLM; Subkey: "Software\Classes\Folder\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
-Root: HKLM; Subkey: "Software\Classes\Drive\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey; Tasks: explorercontext; Check: IsWin64
-Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved"; ValueType: string; ValueName: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueData: "Kopeeer Right-Drag Menu"; Flags: uninsdeletevalue; Tasks: explorercontext; Check: IsWin64
+Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "MUIVerb"; ValueData: "Move with Kopeeer..."; Flags: uninsdeletekey 64bit
+Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith"; ValueType: string; ValueName: "Icon"; ValueData: "{app}\Assets\cut.ico"; Flags: uninsdeletekey 64bit
+Root: HKLM; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" --enqueue --operation move --pick-target --sources ""%1"""; Flags: uninsdeletekey 64bit
 
+Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueType: string; ValueName: ""; ValueData: "Kopeeer Right-Drag Menu"; Flags: uninsdeletekey 64bit; Check: IsWin64
+Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueType: string; ValueName: "AppPath"; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey 64bit; Check: IsWin64
+Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: ""; ValueData: "{app}\Shell\{#AppVersion}\{#ShellExtensionName}"; Flags: uninsdeletekey 64bit; Check: IsWin64
+Root: HKLM; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: "ThreadingModel"; ValueData: "Apartment"; Flags: uninsdeletekey 64bit; Check: IsWin64
+Root: HKLM; Subkey: "Software\Classes\Directory\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey 64bit; Check: IsWin64
+Root: HKLM; Subkey: "Software\Classes\Folder\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey 64bit; Check: IsWin64
+Root: HKLM; Subkey: "Software\Classes\Drive\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey 64bit; Check: IsWin64
+Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved"; ValueType: string; ValueName: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueData: "Kopeeer Right-Drag Menu"; Flags: uninsdeletevalue 64bit; Check: IsWin64
+
+[Icons]
+Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\Assets\{#AppIconName}"
+Name: "{autoprograms}\Kopeeer Diagnostics"; Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{app}\Tools\diagnose-installation.ps1"""; WorkingDir: "{app}"; IconFilename: "{app}\Assets\{#AppIconName}"
+
+[Code]
+const
+  SHCNE_ASSOCCHANGED = $08000000;
+  SHCNF_IDLIST = $0000;
+
+procedure SHChangeNotify(wEventId: Longint; uFlags: Longint; dwItem1: Longint; dwItem2: Longint);
+  external 'SHChangeNotify@shell32.dll stdcall';
+
+function IsExpectedRegValue(RootKey: Integer; Subkey: String; ValueName: String; Expected: String): Boolean;
+var
+  Actual: String;
+begin
+  Result := RegQueryStringValue(RootKey, Subkey, ValueName, Actual) and (Actual = Expected);
+  if not Result then
+  begin
+    Log('Kopeeer validation failed for registry value: ' + Subkey + ' [' + ValueName + '] expected=' + Expected + ' actual=' + Actual);
+  end;
+end;
+
+function ValidateShellIntegration(): Boolean;
+var
+  AppPath: String;
+  ShellPath: String;
+begin
+  AppPath := ExpandConstant('{app}\{#AppExeName}');
+  ShellPath := ExpandConstant('{app}\Shell\{#AppVersion}\{#ShellExtensionName}');
+
+  Result :=
+    FileExists(AppPath) and
+    FileExists(ShellPath) and
+    IsExpectedRegValue(HKLM64, 'Software\Classes\CLSID\{#DragDropMenuClassId}', 'AppPath', AppPath) and
+    IsExpectedRegValue(HKLM64, 'Software\Classes\CLSID\{#DragDropMenuClassId}\InprocServer32', '', ShellPath) and
+    IsExpectedRegValue(HKLM64, 'Software\Classes\CLSID\{#DragDropMenuClassId}\InprocServer32', 'ThreadingModel', 'Apartment') and
+    IsExpectedRegValue(HKLM64, 'Software\Classes\Directory\shellex\DragDropHandlers\Kopeeer', '', '{#DragDropMenuClassId}') and
+    IsExpectedRegValue(HKLM64, 'Software\Classes\Folder\shellex\DragDropHandlers\Kopeeer', '', '{#DragDropMenuClassId}') and
+    IsExpectedRegValue(HKLM64, 'Software\Classes\Drive\shellex\DragDropHandlers\Kopeeer', '', '{#DragDropMenuClassId}') and
+    IsExpectedRegValue(HKLM64, 'Software\Classes\*\shell\Kopeeer.CopyWith', 'MUIVerb', 'Copy with Kopeeer...') and
+    IsExpectedRegValue(HKLM64, 'Software\Classes\*\shell\Kopeeer.MoveWith', 'MUIVerb', 'Move with Kopeeer...');
+
+  if not FileExists(AppPath) then
+  begin
+    Log('Kopeeer validation failed: app executable missing: ' + AppPath);
+  end;
+
+  if not FileExists(ShellPath) then
+  begin
+    Log('Kopeeer validation failed: shell extension missing: ' + ShellPath);
+  end;
+end;
+
+procedure RefreshExplorerShell();
+begin
+  SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssPostInstall then
+  begin
+    if not ValidateShellIntegration() then
+    begin
+      MsgBox('Kopeeer was installed, but Explorer integration could not be verified. The installation will stop so this can be fixed instead of silently leaving Kopeeer unusable.', mbError, MB_OK);
+      RaiseException('Kopeeer Explorer integration validation failed.');
+    end;
+
+    RefreshExplorerShell();
+  end;
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if CurUninstallStep = usPostUninstall then
+  begin
+    RefreshExplorerShell();
+  end;
+end;

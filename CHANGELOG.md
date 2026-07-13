@@ -4,11 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project intends to follow semantic versioning once releases begin.
 
-## Unreleased
+## 1.0.1 - Unreleased
+
+### Fixed
+
+- Fixed Explorer integration being able to appear missing after installation when shell registration was not verified.
+- Fixed missing application icon configuration for Windows Search, shortcuts, taskbar, Alt-Tab, installer, and Programs and Features.
 
 ### Changed
 
 - Replaced the standard Windows transfer-window frame with a compact borderless window style.
+- Made Explorer integration mandatory in the installer and added post-install validation.
+- Added installation diagnostics and shell-integration repair scripts.
+- Added a manual `1.0.1` installer build workflow with checksum artifact output.
 
 ## 1.0.0 - 2026-07-07
 

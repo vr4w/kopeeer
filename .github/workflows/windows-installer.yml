@@ -6,7 +6,7 @@ on:
       version:
         description: "Installer version"
         required: true
-        default: "1.0.0"
+        default: "1.0.1"
 
 jobs:
   build-installer:
@@ -31,8 +31,22 @@ jobs:
         shell: pwsh
         run: .\scripts\build-installer.ps1 -Version "${{ inputs.version }}"
 
+      - name: Create checksum
+        shell: pwsh
+        run: |
+          $installer = "artifacts\installer\Kopeeer-Setup-${{ inputs.version }}.exe"
+          Get-FileHash $installer -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash)  Kopeeer-Setup-${{ inputs.version }}.exe" } |
+            Set-Content "artifacts\installer\Kopeeer-Setup-${{ inputs.version }}.exe.sha256"
+
+      - name: List installer output
+        shell: pwsh
+        run: Get-ChildItem artifacts\installer | Format-Table Name,Length,LastWriteTime
+
       - name: Upload installer
         uses: actions/upload-artifact@v4
         with:
           name: Kopeeer-Setup-${{ inputs.version }}
-          path: artifacts\installer\Kopeeer-Setup-${{ inputs.version }}.exe
+          path: |
+            artifacts\installer\Kopeeer-Setup-${{ inputs.version }}.exe
+            artifacts\installer\Kopeeer-Setup-${{ inputs.version }}.exe.sha256

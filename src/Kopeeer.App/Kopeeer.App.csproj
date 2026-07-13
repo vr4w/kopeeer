@@ -6,6 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>Kopeeer.App</RootNamespace>
     <AssemblyName>Kopeeer.App</AssemblyName>
+    <ApplicationIcon>Assets/app.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../Kopeeer.Core/Kopeeer.Core.csproj" />
@@ -14,5 +15,6 @@
   <ItemGroup>
     <Content Include="Assets/copy.ico" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Assets/cut.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets/app.ico" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
