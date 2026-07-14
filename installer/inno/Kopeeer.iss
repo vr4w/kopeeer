@@ -26,7 +26,7 @@
 #define AppExeName "Kopeeer.App.exe"
 #define AppIconName "app.ico"
 #define ShellExtensionName "Kopeeer.ShellExtension.dll"
-#define ShellExtensionRelativeDir "Shell\{#AppVersion}\{#ShellExtensionBuildId}"
+#define ShellExtensionRelativeDir "Shell\" + AppVersion + "\" + ShellExtensionBuildId
 #define DragDropMenuClassId "{A9D60874-04A4-4962-8798-69D186A6E5E6}"
 #define AppUrl "https://github.com/vr4w/kopeeer"
 
