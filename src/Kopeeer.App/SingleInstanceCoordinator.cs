@@ -7,6 +7,8 @@ public sealed class SingleInstanceCoordinator : IDisposable
 {
     public const string MutexName = "Kopeeer.App.SingleInstance";
     private const string PipeName = "Kopeeer.App.Enqueue";
+    private const int ConnectAttempts = 20;
+    private const int ConnectTimeoutMilliseconds = 250;
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly Func<StartupQueueRequest, Task> _handleRequest;
@@ -23,18 +25,36 @@ public sealed class SingleInstanceCoordinator : IDisposable
 
     public static bool TrySendToRunningInstance(StartupQueueRequest request)
     {
-        try
+        for (var attempt = 1; attempt <= ConnectAttempts; attempt++)
         {
-            using var client = new NamedPipeClientStream(".", PipeName, PipeDirection.Out);
-            client.Connect(2000);
-            JsonSerializer.Serialize(client, request);
-            client.Flush();
-            return true;
+            try
+            {
+                using var client = new NamedPipeClientStream(".", PipeName, PipeDirection.Out);
+                client.Connect(ConnectTimeoutMilliseconds);
+                JsonSerializer.Serialize(client, request);
+                client.Flush();
+                AppDiagnostics.Write($"IPC send succeeded attempt={attempt}");
+                return true;
+            }
+            catch (TimeoutException)
+            {
+                AppDiagnostics.Write($"IPC send timed out attempt={attempt}");
+            }
+            catch (IOException exception)
+            {
+                AppDiagnostics.Write($"IPC send failed attempt={attempt} error=\"{exception.Message}\"");
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                AppDiagnostics.Write($"IPC send denied attempt={attempt} error=\"{exception.Message}\"");
+                return false;
+            }
+
+            Thread.Sleep(100);
         }
-        catch
-        {
-            return false;
-        }
+
+        AppDiagnostics.Write("IPC send failed after retries");
+        return false;
     }
 
     public void Dispose()
@@ -73,16 +93,18 @@ public sealed class SingleInstanceCoordinator : IDisposable
 
                 if (request is not null)
                 {
+                    AppDiagnostics.Write($"IPC request received operation={request.OperationType} sources={request.SourcePaths.Length} target=\"{request.TargetFolder}\" pickTarget={request.PickTarget}");
                     await _handleRequest(request);
+                    AppDiagnostics.Write("IPC request accepted");
                 }
             }
             catch (OperationCanceledException)
             {
                 return;
             }
-            catch
+            catch (Exception exception)
             {
-                // A broken enqueue request should not take down the running queue app.
+                AppDiagnostics.Write($"IPC request failed error=\"{exception.Message}\"");
             }
         }
     }

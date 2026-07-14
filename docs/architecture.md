@@ -78,7 +78,7 @@ Current behavior:
 - Copy or move operation selection.
 - In-memory queue display.
 - Sequential queue processing.
-- Local logging to `logs/kopeeer.log`.
+- Local logging to `%LOCALAPPDATA%/Kopeeer/logs/kopeeer.log`.
 
 It has a first safe Explorer context menu integration path. It still does not install a native Shell Extension or intercept live drag-and-drop.
 

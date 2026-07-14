@@ -30,15 +30,24 @@ artifacts/installer/Kopeeer-Setup-1.0.1.exe
 
 ## Explorer Integration
 
-1. Right-drag a file onto a target folder.
-2. Confirm `Copy with Kopeeer` and `Move with Kopeeer` appear.
-3. Right-drag a folder onto a target folder.
-4. Confirm both Kopeeer entries appear.
-5. Right-click a file normally.
-6. Confirm `Copy with Kopeeer...` and `Move with Kopeeer...` appear.
-7. Right-click a folder normally.
-8. Confirm fallback entries appear.
-9. Confirm an Explorer restart or sign-out is not required after a fresh install unless Windows keeps old shell state cached.
+1. Close Kopeeer completely.
+2. Right-drag a file onto a target folder.
+3. Choose `Copy with Kopeeer`.
+4. Confirm Kopeeer starts automatically and the job runs.
+5. Close Kopeeer completely again.
+6. Right-drag a file onto a target folder.
+7. Choose `Move with Kopeeer`.
+8. Confirm Kopeeer starts automatically and the job runs.
+9. Start Kopeeer manually.
+10. Right-drag another file or folder onto a target folder.
+11. Confirm the job is added to the running Kopeeer instance.
+12. Right-drag a folder onto a target folder.
+13. Confirm `Copy with Kopeeer` and `Move with Kopeeer` appear.
+14. Right-click a file normally.
+15. Confirm `Copy with Kopeeer...` and `Move with Kopeeer...` appear.
+16. Right-click a folder normally.
+17. Confirm fallback entries appear.
+18. Confirm an Explorer restart or sign-out is not required after a fresh install unless Windows keeps old shell state cached.
 
 ## File Operations
 
@@ -49,6 +58,8 @@ artifacts/installer/Kopeeer-Setup-1.0.1.exe
 5. Queue several jobs and confirm they run one after another.
 6. Trigger an existing-target conflict and confirm rename/skip/cancel behavior.
 7. Press `Cancel` during a queue and confirm behavior is clear.
+8. Queue 5, 10, and 20 jobs and confirm the upcoming-job list does not flicker while one transfer is running.
+9. Add more jobs while a transfer is already running and confirm the visible queue remains stable.
 
 ## Borderless Window
 
@@ -80,6 +91,19 @@ Expected result:
 - PASS for CLSID registration.
 - PASS for right-drag handlers.
 - PASS for fallback context menu entries.
+
+Runtime logs:
+
+```text
+%LOCALAPPDATA%\Kopeeer\logs\kopeeer.log
+%LOCALAPPDATA%\Kopeeer\shell-extension.log
+```
+
+Expected result:
+
+- Shell log records the selected copy/move command.
+- Shell log records source count, target folder, resolved app path, working directory, and app-start result.
+- App log records startup, running-instance detection, IPC success/failure, accepted queue requests, and job status.
 
 Run repair from an elevated PowerShell:
 

@@ -10,6 +10,8 @@ The format is based on Keep a Changelog, and this project intends to follow sema
 
 - Fixed Explorer integration being able to appear missing after installation when shell registration was not verified.
 - Fixed missing application icon configuration for Windows Search, shortcuts, taskbar, Alt-Tab, installer, and Programs and Features.
+- Fixed Explorer cold-start requests being able to disappear when Kopeeer was not already running.
+- Fixed queue-list flicker during active transfers by separating progress updates from structural queue refreshes.
 
 ### Changed
 
@@ -17,6 +19,8 @@ The format is based on Keep a Changelog, and this project intends to follow sema
 - Made Explorer integration mandatory in the installer and added post-install validation.
 - Added installation diagnostics and shell-integration repair scripts.
 - Added a manual `1.0.1` installer build workflow with checksum artifact output.
+- Moved runtime logging to the user's local app data folder so Explorer-launched startup does not depend on the inherited working directory.
+- Added bounded IPC retries and clearer diagnostics for Explorer-to-app enqueue requests.
 
 ## 1.0.0 - 2026-07-07
 

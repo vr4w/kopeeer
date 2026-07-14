@@ -23,14 +23,20 @@ public sealed class FileJobLogger(string logFilePath) : IJobLogger
 
     private void Write(string message)
     {
-        var directory = Path.GetDirectoryName(LogFilePath);
-        if (!string.IsNullOrWhiteSpace(directory))
+        try
         {
-            Directory.CreateDirectory(directory);
-        }
+            var directory = Path.GetDirectoryName(LogFilePath);
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
 
-        var line = $"{DateTimeOffset.Now:O} {message}{Environment.NewLine}";
-        File.AppendAllText(LogFilePath, line);
+            var line = $"{DateTimeOffset.Now:O} {message}{Environment.NewLine}";
+            File.AppendAllText(LogFilePath, line);
+        }
+        catch
+        {
+            // Logging must never break a transfer or Explorer-launched startup.
+        }
     }
 }
-

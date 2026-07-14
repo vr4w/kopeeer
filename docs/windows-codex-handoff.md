@@ -64,7 +64,7 @@ App behavior:
 - In-memory queue.
 - Sequential queue processing.
 - Basic status display.
-- Basic log file at `logs\kopeeer.log`.
+- Basic app log file at `%LOCALAPPDATA%\Kopeeer\logs\kopeeer.log`.
 - Existing target files/folders are not overwritten silently.
 - Failures are shown in the queue.
 
@@ -237,7 +237,7 @@ Manual app test:
 - Queue processes jobs sequentially.
 - Existing target conflicts fail clearly.
 - App does not crash.
-- Log file is written to `logs\kopeeer.log`.
+- Log file is written to `%LOCALAPPDATA%\Kopeeer\logs\kopeeer.log`.
 
 Context menu dev script test:
 

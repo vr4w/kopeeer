@@ -47,7 +47,7 @@ public sealed class MainForm : Form
     private readonly Label _speedLabel = new();
     private readonly Label _bytesLabel = new();
     private readonly ThinProgressBar _overallProgressBar = new();
-    private readonly FlowLayoutPanel _queueList = new();
+    private readonly FlowLayoutPanel _queueList = new BufferedFlowLayoutPanel();
     private readonly Panel _emptyState = new();
     private readonly Panel _manualPanel = new();
     private readonly RowStyle _queueRowStyle = new(SizeType.Absolute, 26);
@@ -66,7 +66,7 @@ public sealed class MainForm : Form
         Font = new Font("Segoe UI", 9F);
         Padding = new Padding(1);
 
-        _logger = new FileJobLogger(Path.Combine(Directory.GetCurrentDirectory(), "logs", "kopeeer.log"));
+        _logger = new FileJobLogger(AppDiagnostics.LogFilePath);
         _queueProcessor = new SequentialQueueProcessor(_queue, new FileOperationProcessor(), _logger);
         _logger.AppStarted();
 
@@ -615,7 +615,7 @@ public sealed class MainForm : Form
 
         try
         {
-            await _queueProcessor.ProcessAllAsync(RefreshQueueList, _ => RefreshQueueList(), ResolveTargetConflict, _queueCancellationSource.Token);
+            await _queueProcessor.ProcessAllAsync(RefreshQueueList, _ => RefreshTransferProgress(), ResolveTargetConflict, _queueCancellationSource.Token);
             UpdateStatus(BuildCompletionMessage());
             if (_shutdownWhenDoneCheckBox.Checked && _jobs.Count > 0 && _jobs.All(IsFinished))
             {
@@ -718,6 +718,18 @@ public sealed class MainForm : Form
         ResizeQueueArea(pendingJobs.Length);
         UpdateTransferPanel();
         RefreshActions();
+    }
+
+    private void RefreshTransferProgress()
+    {
+        if (InvokeRequired)
+        {
+            BeginInvoke((MethodInvoker)RefreshTransferProgress);
+            return;
+        }
+
+        UpdateTransferPanel();
+        _summaryLabel.Text = BuildSummary();
     }
 
     private Control BuildQueueRow(QueueJob job)
@@ -1219,7 +1231,13 @@ public sealed class MainForm : Form
             get => _value;
             set
             {
-                _value = Math.Clamp(value, 0, 100);
+                var nextValue = Math.Clamp(value, 0, 100);
+                if (_value == nextValue)
+                {
+                    return;
+                }
+
+                _value = nextValue;
                 Invalidate();
             }
         }
@@ -1245,6 +1263,15 @@ public sealed class MainForm : Form
             {
                 e.Graphics.FillRectangle(barBrush, 0, 0, width, ClientSize.Height);
             }
+        }
+    }
+
+    private sealed class BufferedFlowLayoutPanel : FlowLayoutPanel
+    {
+        public BufferedFlowLayoutPanel()
+        {
+            DoubleBuffered = true;
+            ResizeRedraw = true;
         }
     }
 }

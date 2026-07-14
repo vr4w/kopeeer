@@ -134,19 +134,28 @@ std::wstring TryReadRegisteredAppPath(HKEY root, const wchar_t* classIdText)
     std::wstring key = L"Software\\Classes\\CLSID\\";
     key += classIdText;
 
+    auto flags = static_cast<DWORD>(RRF_RT_REG_SZ);
+    if (root == HKEY_LOCAL_MACHINE)
+    {
+        flags |= RRF_SUBKEY_WOW6464KEY;
+    }
+
     const auto result = RegGetValueW(
         root,
         key.c_str(),
         AppPathValueName,
-        RRF_RT_REG_SZ,
+        flags,
         nullptr,
         value,
         &valueSize);
 
     if (result == ERROR_SUCCESS && value[0] != L'\0')
     {
+        Log(L"Registered app path found: " + std::wstring(value));
         return value;
     }
+
+    Log(L"Registered app path not found for " + std::wstring(classIdText) + L", error=" + std::to_wstring(result));
 
     return {};
 }
@@ -180,6 +189,17 @@ std::wstring ReadRegisteredAppPath()
     }
 
     return {};
+}
+
+std::wstring GetParentDirectory(const std::wstring& path)
+{
+    wchar_t folder[MAX_PATH * 4]{};
+    if (FAILED(StringCchCopyW(folder, ARRAYSIZE(folder), path.c_str())))
+    {
+        return {};
+    }
+
+    return PathRemoveFileSpecW(folder) ? std::wstring(folder) : std::wstring{};
 }
 
 std::vector<std::wstring> ExtractHDropPaths(IDataObject* dataObject)
@@ -223,10 +243,26 @@ std::vector<std::wstring> ExtractHDropPaths(IDataObject* dataObject)
 
 HRESULT LaunchKopeeer(const std::wstring& operation, const std::wstring& targetFolder, const std::vector<std::wstring>& sources)
 {
+    Log(L"Shell command selected. Operation: " + operation + L", target: " + targetFolder + L", sources: " + std::to_wstring(sources.size()));
+
     const auto appPath = ReadRegisteredAppPath();
     if (appPath.empty())
     {
         Log(L"No Kopeeer app path is registered.");
+        return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
+    }
+
+    Log(L"Resolved Kopeeer app path: " + appPath);
+
+    if (PathIsRelativeW(appPath.c_str()))
+    {
+        Log(L"Registered Kopeeer app path is relative, refusing to start.");
+        return HRESULT_FROM_WIN32(ERROR_BAD_PATHNAME);
+    }
+
+    if (!PathFileExistsW(appPath.c_str()))
+    {
+        Log(L"Registered Kopeeer app path does not exist.");
         return HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND);
     }
 
@@ -255,6 +291,15 @@ HRESULT LaunchKopeeer(const std::wstring& operation, const std::wstring& targetF
         command += Quote(source);
     }
 
+    const auto workingDirectory = GetParentDirectory(appPath);
+    if (workingDirectory.empty())
+    {
+        Log(L"Could not resolve Kopeeer working directory.");
+        return HRESULT_FROM_WIN32(ERROR_BAD_PATHNAME);
+    }
+
+    Log(L"Starting Kopeeer. Working directory: " + workingDirectory);
+
     STARTUPINFOW startupInfo{};
     startupInfo.cb = sizeof(startupInfo);
     PROCESS_INFORMATION processInfo{};
@@ -263,26 +308,26 @@ HRESULT LaunchKopeeer(const std::wstring& operation, const std::wstring& targetF
     mutableCommand.push_back(L'\0');
 
     if (!CreateProcessW(
-        nullptr,
+        appPath.c_str(),
         mutableCommand.data(),
         nullptr,
         nullptr,
         FALSE,
         0,
         nullptr,
-        nullptr,
+        workingDirectory.c_str(),
         &startupInfo,
         &processInfo))
     {
         const auto error = GetLastError();
-        Log(L"CreateProcessW failed for Kopeeer.App.exe.");
+        Log(L"CreateProcessW failed for Kopeeer.App.exe. error=" + std::to_wstring(error));
         return HRESULT_FROM_WIN32(error);
     }
 
     CloseHandle(processInfo.hThread);
     CloseHandle(processInfo.hProcess);
 
-    Log(L"Queued " + operation + L" into Kopeeer. Target: " + targetFolder + L", sources: " + std::to_wstring(sources.size()));
+    Log(L"App start requested successfully for Kopeeer. Target: " + targetFolder + L", sources: " + std::to_wstring(sources.size()));
     return S_OK;
 }
 

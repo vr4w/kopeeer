@@ -43,7 +43,7 @@ Expected result:
 - You can add a job to the queue.
 - You can start the queue.
 - Jobs run one at a time.
-- `logs\kopeeer.log` is written.
+- `%LOCALAPPDATA%\Kopeeer\logs\kopeeer.log` is written.
 
 The app should keep "Add to queue" disabled until both source and target are selected. "Start queue" should stay disabled until at least one pending job exists.
 
