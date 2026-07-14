@@ -32,11 +32,7 @@ Kopeeer-Setup-1.0.1.exe
 
 The installer asks for administrator approval because Windows Explorer loads the right-drag shell extension reliably when it is registered machine-wide.
 
-SHA256 checksums are published with each release. For `Kopeeer-Setup-1.0.1.exe`:
-
-```text
-9b7667f40e99ed58277f2a86502e54c87e5542cdc112f25a622bd5a3069c7140
-```
+SHA256 checksums are published with each release. Download the matching `.sha256` file from the release page and compare it with the installer before installing.
 
 ## What Works
 
