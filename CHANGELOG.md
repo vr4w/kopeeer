@@ -4,29 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, and this project intends to follow semantic versioning once releases begin.
 
-## 1.0.1 - Unreleased
+## 1.0.1 - 2026-07-14
 
 ### Fixed
 
-- Fixed Explorer integration being able to appear missing after installation when shell registration was not verified.
-- Fixed missing application icon configuration for Windows Search, shortcuts, taskbar, Alt-Tab, installer, and Programs and Features.
-- Fixed Explorer cold-start requests being able to disappear when Kopeeer was not already running.
-- Fixed queue-list flicker during active transfers by separating progress updates from structural queue refreshes.
-- Fixed `Esc` handling so it uses the same cancel/close behavior as the visible window buttons.
-- Fixed canceled file transfers being able to leave a partial file at the final target path.
-- Fixed same-version installer upgrades being able to hit a locked `Kopeeer.ShellExtension.dll` while Explorer still had the old shell extension loaded.
+- Explorer integration now starts Kopeeer correctly when no instance is running.
+- Queue list flicker with multiple pending jobs.
+- Explorer shell integration registration on 64-bit Windows.
+- Missing application icon in Windows Search and shortcuts.
+- Incomplete destination files are cleaned up after cancellation.
+- Installer upgrade handling when Explorer has loaded the shell extension.
 
 ### Changed
 
-- Replaced the standard Windows transfer-window frame with a compact borderless window style.
-- Made Explorer integration mandatory in the installer and added post-install validation.
-- Added installation diagnostics and shell-integration repair scripts.
-- Added a manual `1.0.1` installer build workflow with checksum artifact output.
-- Moved runtime logging to the user's local app data folder so Explorer-launched startup does not depend on the inherited working directory.
-- Added bounded IPC retries and clearer diagnostics for Explorer-to-app enqueue requests.
-- Changed file copy behavior to write `.kopeeer-part` temporary files first and move them into place only after a successful copy.
-- Changed installer shell-extension placement to use a build-specific folder so upgrades can point Explorer to a new DLL without replacing a loaded one in place.
-- Documented the current unsigned-installer / `Unknown publisher` behavior and SHA256 verification expectation.
+- Compact borderless transfer window.
+- Improved installer validation and diagnostics.
+- Safer temporary-file handling for copy and move operations.
+- Escape key now cancels an active queue or closes an idle window.
+
+### Security / Documentation
+
+- Unsigned publisher / SmartScreen behavior documented.
+- SHA256 checksum published for the installer.
 
 ## 1.0.0 - 2026-07-07
 

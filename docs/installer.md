@@ -40,7 +40,7 @@ scripts\build-installer.ps1
 Optional custom version:
 
 ```powershell
-scripts\build-installer.ps1 -Version "1.0.0"
+scripts\build-installer.ps1 -Version "1.0.1"
 ```
 
 Optional custom Inno Setup compiler path:
@@ -52,7 +52,7 @@ scripts\build-installer.ps1 -InnoCompilerPath "C:\Path\To\ISCC.exe"
 Expected output:
 
 ```text
-artifacts\installer\Kopeeer-Setup-1.0.0.exe
+artifacts\installer\Kopeeer-Setup-1.0.1.exe
 ```
 
 Before publishing a release, install the generated EXE on a Windows test machine and confirm Explorer copy/move behavior, upgrade behavior, and uninstall cleanup.

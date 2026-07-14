@@ -4,17 +4,17 @@ Kopeeer is a small Windows utility that queues copy and move operations from Fil
 
 It lets you right-drag files or folders onto a destination folder, choose `Copy with Kopeeer` or `Move with Kopeeer`, and then processes the jobs one after another in a compact transfer window.
 
-Status: `1.0.0`.
+Status: `1.0.1`.
 
-**[Download Kopeeer-Setup-1.0.0.exe](https://github.com/vr4w/kopeeer/releases/download/v1.0.0/Kopeeer-Setup-1.0.0.exe)**
+**[Download Kopeeer-Setup-1.0.1.exe](https://github.com/vr4w/kopeeer/releases/download/v1.0.1/Kopeeer-Setup-1.0.1.exe)**
 
-Release page: [Kopeeer 1.0.0](https://github.com/vr4w/kopeeer/releases/tag/v1.0.0)
+Release page: [Kopeeer 1.0.1](https://github.com/vr4w/kopeeer/releases/tag/v1.0.1)
 
 ![Kopeeer queuing multiple Windows Explorer file transfers](docs/assets/kopeeer-demo.gif)
 
 ## Download For Windows
 
-**[Download Kopeeer-Setup-1.0.0.exe](https://github.com/vr4w/kopeeer/releases/download/v1.0.0/Kopeeer-Setup-1.0.0.exe)**
+**[Download Kopeeer-Setup-1.0.1.exe](https://github.com/vr4w/kopeeer/releases/download/v1.0.1/Kopeeer-Setup-1.0.1.exe)**
 
 This is the installer for normal Windows use. Download it, run it, and use Kopeeer from the Windows Explorer right-drag menu.
 
@@ -27,10 +27,16 @@ If the direct download link above does not work, open the latest release and dow
 **[Open Kopeeer Releases](https://github.com/vr4w/kopeeer/releases/latest)**
 
 ```text
-Kopeeer-Setup-1.0.0.exe
+Kopeeer-Setup-1.0.1.exe
 ```
 
 The installer asks for administrator approval because Windows Explorer loads the right-drag shell extension reliably when it is registered machine-wide.
+
+SHA256 checksums are published with each release. For `Kopeeer-Setup-1.0.1.exe`:
+
+```text
+9b7667f40e99ed58277f2a86502e54c87e5542cdc112f25a622bd5a3069c7140
+```
 
 ## What Works
 
@@ -39,7 +45,7 @@ The installer asks for administrator approval because Windows Explorer loads the
   - `Move with Kopeeer`
 - Classic right-click fallback commands for files and folders.
 - Sequential copy/move queue.
-- Compact transfer window with:
+- Compact borderless transfer window with:
   - current file name
   - overall progress bar
   - transfer speed
@@ -48,8 +54,10 @@ The installer asks for administrator approval because Windows Explorer loads the
   - upcoming file sizes
   - copy/move status per job
 - Windows dark-mode aware UI.
+- Explorer commands start Kopeeer automatically when no Kopeeer window is already running.
 - Optional `Shut down when done`.
 - Existing target files and folders are not overwritten silently.
+- Canceled transfers clean up incomplete temporary files instead of leaving half-written final files.
 - Self-contained Windows build; no separate .NET runtime is required for the installed app.
 
 ## Use
@@ -105,7 +113,7 @@ scripts\build-installer.ps1
 Expected output:
 
 ```text
-artifacts\installer\Kopeeer-Setup-1.0.0.exe
+artifacts\installer\Kopeeer-Setup-1.0.1.exe
 ```
 
 ## Repository Shape
@@ -126,7 +134,7 @@ The current Explorer integration is based on a native shell extension. Early exp
 
 ## Road To 1.0
 
-Kopeeer `1.0.0` is the first stable Explorer-first release. Future work should stay focused on reliability, clearer troubleshooting, and broader Windows testing.
+Kopeeer `1.0.1` is the current stable Explorer-first release. Future work should stay focused on reliability, clearer troubleshooting, and broader Windows testing.
 
 For major changes, test copy, move, conflict handling, cancellation, uninstall, and reinstall before publishing a new release.
 
@@ -139,6 +147,15 @@ If Windows shows only the normal copy menu, make sure you are dragging with the 
 If Kopeeer opens but does not copy, uninstall Kopeeer, install the latest `.exe` from the release page again, and retry with a small test file first.
 
 If Windows shows `Unknown publisher` or a SmartScreen warning, that is expected for now because Kopeeer is not code-signed yet. Only download the installer from the official GitHub Releases page, and compare the provided SHA256 checksum before installing.
+
+Kopeeer installs diagnostic and repair tools here:
+
+```text
+C:\Program Files\Kopeeer\Tools\diagnose-installation.ps1
+C:\Program Files\Kopeeer\Tools\repair-shell-integration.ps1
+```
+
+Run diagnostics from PowerShell if Explorer entries do not appear after installation.
 
 ## License
 
