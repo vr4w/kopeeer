@@ -65,17 +65,39 @@ function Resolve-InstallDir {
     return Join-Path $env:ProgramFiles "Kopeeer"
 }
 
+function Resolve-ShellExtensionPath {
+    param(
+        [string]$InstallDir,
+        [string]$Version
+    )
+
+    $registeredShellPath = Get-RegValue "HKLM\Software\Kopeeer" "ShellExtensionPath"
+    if (-not [string]::IsNullOrWhiteSpace($registeredShellPath)) {
+        return $registeredShellPath
+    }
+
+    $shellRoot = Join-Path $InstallDir "Shell"
+    if (Test-Path -LiteralPath $shellRoot) {
+        $candidate = Get-ChildItem -LiteralPath $shellRoot -Filter "Kopeeer.ShellExtension.dll" -Recurse -File -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTimeUtc -Descending |
+            Select-Object -First 1
+        if ($candidate) {
+            return $candidate.FullName
+        }
+    }
+
+    return Join-Path $InstallDir "Shell\$Version\Kopeeer.ShellExtension.dll"
+}
+
 $InstallDir = Resolve-InstallDir $InstallDir
 $appPath = Join-Path $InstallDir "Kopeeer.App.exe"
 $version = Get-RegValue "HKLM\Software\Kopeeer" "Version"
-$shellPath = Get-RegValue "HKLM\Software\Kopeeer" "ShellExtensionPath"
-if ([string]::IsNullOrWhiteSpace($shellPath)) {
-    $shellPath = Join-Path $InstallDir "Shell\$version\Kopeeer.ShellExtension.dll"
-}
+$shellPath = Resolve-ShellExtensionPath $InstallDir $version
 
 Write-Host "Kopeeer installation diagnostics"
 Write-Host "InstallDir: $InstallDir"
 Write-Host "Version: $version"
+Write-Host "ShellExtensionPath: $shellPath"
 Write-Host ""
 
 Test-Check "App executable exists" (Test-Path -LiteralPath $appPath) "Missing app executable: $appPath"

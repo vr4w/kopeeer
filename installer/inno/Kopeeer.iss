@@ -17,11 +17,16 @@
 #define DropHandlerDir "..\..\artifacts\publish\Kopeeer.Shell"
 #endif
 
+#ifndef ShellExtensionBuildId
+#define ShellExtensionBuildId "local"
+#endif
+
 #define AppName "Kopeeer"
 #define AppPublisher "vr4w"
 #define AppExeName "Kopeeer.App.exe"
 #define AppIconName "app.ico"
 #define ShellExtensionName "Kopeeer.ShellExtension.dll"
+#define ShellExtensionRelativeDir "Shell\{#AppVersion}\{#ShellExtensionBuildId}"
 #define DragDropMenuClassId "{A9D60874-04A4-4962-8798-69D186A6E5E6}"
 #define AppUrl "https://github.com/vr4w/kopeeer"
 
@@ -58,14 +63,15 @@ FinishedLabel=Kopeeer is ready in Windows Explorer. Right-drag files or folders 
 
 [Files]
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#DropHandlerDir}\{#ShellExtensionName}"; DestDir: "{app}\Shell\{#AppVersion}"; Flags: ignoreversion
+Source: "{#DropHandlerDir}\{#ShellExtensionName}"; DestDir: "{app}\{#ShellExtensionRelativeDir}"; Flags: ignoreversion restartreplace uninsrestartdelete
 Source: "..\..\scripts\diagnose-installation.ps1"; DestDir: "{app}\Tools"; Flags: ignoreversion
 Source: "..\..\scripts\repair-shell-integration.ps1"; DestDir: "{app}\Tools"; Flags: ignoreversion
 
 [Registry]
 Root: HKLM64; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "InstallDir"; ValueData: "{app}"; Flags: uninsdeletekey
 Root: HKLM64; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "AppPath"; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey
-Root: HKLM64; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "ShellExtensionPath"; ValueData: "{app}\Shell\{#AppVersion}\{#ShellExtensionName}"; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "ShellExtensionPath"; ValueData: "{app}\{#ShellExtensionRelativeDir}\{#ShellExtensionName}"; Flags: uninsdeletekey
+Root: HKLM64; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "ShellExtensionBuildId"; ValueData: "{#ShellExtensionBuildId}"; Flags: uninsdeletekey
 Root: HKLM64; Subkey: "Software\Kopeeer"; ValueType: string; ValueName: "Version"; ValueData: "{#AppVersion}"; Flags: uninsdeletekey
 Root: HKLM64; Subkey: "Software\Microsoft\Windows\CurrentVersion\App Paths\{#AppExeName}"; ValueType: string; ValueName: ""; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey
 Root: HKLM64; Subkey: "Software\Microsoft\Windows\CurrentVersion\App Paths\{#AppExeName}"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Flags: uninsdeletekey
@@ -88,7 +94,7 @@ Root: HKLM64; Subkey: "Software\Classes\Directory\shell\Kopeeer.MoveWith\command
 
 Root: HKLM64; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueType: string; ValueName: ""; ValueData: "Kopeeer Right-Drag Menu"; Flags: uninsdeletekey; Check: IsWin64
 Root: HKLM64; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; ValueType: string; ValueName: "AppPath"; ValueData: "{app}\{#AppExeName}"; Flags: uninsdeletekey; Check: IsWin64
-Root: HKLM64; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: ""; ValueData: "{app}\Shell\{#AppVersion}\{#ShellExtensionName}"; Flags: uninsdeletekey; Check: IsWin64
+Root: HKLM64; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: ""; ValueData: "{app}\{#ShellExtensionRelativeDir}\{#ShellExtensionName}"; Flags: uninsdeletekey; Check: IsWin64
 Root: HKLM64; Subkey: "Software\Classes\CLSID\{{A9D60874-04A4-4962-8798-69D186A6E5E6}\InprocServer32"; ValueType: string; ValueName: "ThreadingModel"; ValueData: "Apartment"; Flags: uninsdeletekey; Check: IsWin64
 Root: HKLM64; Subkey: "Software\Classes\Directory\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey; Check: IsWin64
 Root: HKLM64; Subkey: "Software\Classes\Folder\shellex\DragDropHandlers\Kopeeer"; ValueType: string; ValueName: ""; ValueData: "{{A9D60874-04A4-4962-8798-69D186A6E5E6}"; Flags: uninsdeletekey; Check: IsWin64
@@ -124,7 +130,7 @@ var
   ShellPath: String;
 begin
   AppPath := ExpandConstant('{app}\{#AppExeName}');
-  ShellPath := ExpandConstant('{app}\Shell\{#AppVersion}\{#ShellExtensionName}');
+  ShellPath := ExpandConstant('{app}\{#ShellExtensionRelativeDir}\{#ShellExtensionName}');
 
   Result :=
     FileExists(AppPath) and
@@ -154,9 +160,28 @@ begin
   SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, 0, 0);
 end;
 
+procedure RemoveShellIntegrationRegistration();
+begin
+  Log('Removing existing Kopeeer shell integration registration before file changes.');
+  RegDeleteKeyIncludingSubkeys(HKLM64, 'Software\Classes\*\shell\Kopeeer.CopyWith');
+  RegDeleteKeyIncludingSubkeys(HKLM64, 'Software\Classes\*\shell\Kopeeer.MoveWith');
+  RegDeleteKeyIncludingSubkeys(HKLM64, 'Software\Classes\Directory\shell\Kopeeer.CopyWith');
+  RegDeleteKeyIncludingSubkeys(HKLM64, 'Software\Classes\Directory\shell\Kopeeer.MoveWith');
+  RegDeleteKeyIncludingSubkeys(HKLM64, 'Software\Classes\Directory\shellex\DragDropHandlers\Kopeeer');
+  RegDeleteKeyIncludingSubkeys(HKLM64, 'Software\Classes\Folder\shellex\DragDropHandlers\Kopeeer');
+  RegDeleteKeyIncludingSubkeys(HKLM64, 'Software\Classes\Drive\shellex\DragDropHandlers\Kopeeer');
+  RegDeleteKeyIncludingSubkeys(HKLM64, 'Software\Classes\CLSID\{#DragDropMenuClassId}');
+  RegDeleteValue(HKLM64, 'Software\Microsoft\Windows\CurrentVersion\Shell Extensions\Approved', '{#DragDropMenuClassId}');
+  RefreshExplorerShell();
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
-  if CurStep = ssPostInstall then
+  if CurStep = ssInstall then
+  begin
+    RemoveShellIntegrationRegistration();
+  end
+  else if CurStep = ssPostInstall then
   begin
     if not ValidateShellIntegration() then
     begin
@@ -170,7 +195,11 @@ end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
-  if CurUninstallStep = usPostUninstall then
+  if CurUninstallStep = usUninstall then
+  begin
+    RemoveShellIntegrationRegistration();
+  end
+  else if CurUninstallStep = usPostUninstall then
   begin
     RefreshExplorerShell();
   end;

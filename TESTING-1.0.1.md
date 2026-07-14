@@ -60,6 +60,13 @@ artifacts/installer/Kopeeer-Setup-1.0.1.exe
 7. Press `Cancel` during a queue and confirm behavior is clear.
 8. Queue 5, 10, and 20 jobs and confirm the upcoming-job list does not flicker while one transfer is running.
 9. Add more jobs while a transfer is already running and confirm the visible queue remains stable.
+10. Press `Esc` during an active copy and confirm it behaves exactly like `Cancel`.
+11. Press `Esc` during an active move and confirm it behaves exactly like `Cancel`.
+12. Press `Esc` while idle and confirm the Kopeeer window closes.
+13. Cancel during a large file copy and confirm no final half-written target file remains.
+14. Confirm temporary `.kopeeer-part` files are removed after cancel.
+15. Cancel during a move and confirm the source file or source folder remains intact.
+16. Simulate or inspect cleanup failure behavior if possible and confirm it is logged.
 
 ## Borderless Window
 
@@ -128,6 +135,18 @@ Expected result:
 7. Install public `1.0.0`.
 8. Upgrade to `1.0.1`.
 9. Confirm app, icon, shell extension, diagnostics, and Explorer entries work after upgrade.
+10. Install a newer `1.0.1` test build over an already installed `1.0.1` test build while Explorer is running.
+11. Confirm the installer does not show a raw `DeleteFile failed; code 5` error for `Kopeeer.ShellExtension.dll`.
+12. Confirm Explorer entries use the new build after reinstall.
+13. Uninstall while Explorer has already loaded the shell extension.
+14. Confirm uninstall removes registration and either removes the DLL or schedules cleanup without a raw file-lock error.
+
+## SmartScreen / Publisher Warning
+
+1. Download only the installer from the official GitHub Actions artifact or GitHub Release under test.
+2. Compare the SHA256 checksum before installing.
+3. If Windows shows `Unknown publisher` or SmartScreen, confirm the README/Troubleshooting note explains that Kopeeer is currently not code-signed.
+4. Confirm no installer text falsely claims that Kopeeer is signed.
 
 ## Pass Criteria
 

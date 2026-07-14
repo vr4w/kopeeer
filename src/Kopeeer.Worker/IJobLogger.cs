@@ -13,5 +13,6 @@ public interface IJobLogger
     void JobCompleted(QueueJob job);
 
     void JobFailed(QueueJob job, string errorMessage);
-}
 
+    void CleanupFailed(string path, string errorMessage);
+}

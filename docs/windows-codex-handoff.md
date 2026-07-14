@@ -85,12 +85,9 @@ Installer alpha behavior:
 
 - Inno Setup script exists at `installer/inno/Kopeeer.iss`.
 - Builder script exists at `scripts/build-installer.ps1`.
-- Installer installs into the current user's local app folder.
-- Installer should not require admin rights.
-- Installer has option `Add Explorer context menu commands`.
-- Installer does not install a native Shell Extension.
-- Installer does not register COM.
-- Installer does not implement drag-and-drop interception.
+- Current public installer installs into `Program Files` and requires administrator approval.
+- Current public installer registers the native Explorer right-drag Shell Extension machine-wide.
+- Current public installer registers Kopeeer Explorer integration as the main product workflow.
 
 CI:
 
@@ -277,9 +274,8 @@ artifacts\installer\Kopeeer-Setup-0.2.0-alpha.exe
 
 Test:
 
-- Installer completes without admin rights.
-- Installer shows `Add Explorer context menu commands`.
-- With the option enabled, context menu entries appear.
+- Installer completes with administrator approval.
+- Explorer context menu entries appear after installation.
 - Copy/move entries work after install.
 - Uninstall removes the app and context menu entries.
 

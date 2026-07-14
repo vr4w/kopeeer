@@ -128,10 +128,9 @@ artifacts\installer\Kopeeer-Setup-0.2.0-alpha.exe
 
 Expected result:
 
-- Installer finishes without admin rights.
-- `Add Explorer context menu commands` is visible as an option.
-- With the option enabled, copy and move entries appear in Explorer.
-- Uninstall removes the installed app and the current-user context menu entries.
+- Installer finishes with administrator approval.
+- Copy and move entries appear in Explorer after installation.
+- Uninstall removes the installed app and Kopeeer Explorer entries.
 
 ## Drag-and-drop Hook Check
 

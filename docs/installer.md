@@ -4,7 +4,7 @@ The project needs an installer because deep Windows integration must be register
 
 ## Installer Direction
 
-Kopeeer currently uses Inno Setup. The installer should feel like a small Windows utility installer: install it once, keep the Explorer integration enabled, then forget about the app until a transfer starts.
+Kopeeer currently uses Inno Setup. The installer should feel like a small Windows utility installer: install it once, use the Explorer integration, then forget about the app until a transfer starts.
 
 The installer should not launch Kopeeer at the end. Kopeeer is started by Explorer when the user chooses `Copy with Kopeeer` or `Move with Kopeeer`.
 
@@ -21,7 +21,7 @@ Current repository state:
 - It also registers classic right-click fallback commands for files and folders.
 - It uses separate copy and cut icon assets for the Explorer menu entries.
 - It does not start Kopeeer after installation.
-- It installs the Explorer Shell Extension into a versioned folder so upgrades do not have to close Explorer just to replace a loaded DLL.
+- It installs the Explorer Shell Extension into a build-specific folder so upgrades do not have to close Explorer just to replace a loaded DLL.
 
 ## Build Installer
 
@@ -64,13 +64,11 @@ Before publishing a release, install the generated EXE on a Windows test machine
 - Register Explorer menu entries.
 - Avoid closing Explorer during normal install and upgrade.
 - Cleanly unregister everything on uninstall.
-- Make integration choices visible instead of silently modifying Explorer.
+- Explain clearly that Explorer integration is installed.
 
-## Installer Options
+## Explorer Integration
 
-Current option:
-
-- Add Kopeeer to Explorer right-drag menus.
+The public installer registers Kopeeer's Explorer integration by default because this is the main product workflow.
 
 ## Language Strategy
 
@@ -106,6 +104,8 @@ Uninstall must:
 A public release should eventually be code-signed.
 
 Unsigned Shell Extensions and installers can look alarming and may reduce trust. Signing is not required for the first stable release, but it should be planned before broader public distribution.
+
+Current public installers are not code-signed. Windows may show `Unknown publisher` or SmartScreen warnings. Do not work around this with unsafe tricks or misleading copy; publish SHA256 checksums with releases and tell users to download installers only from the official GitHub Releases page. A future signing flow should use a real code-signing certificate and be added to the release pipeline deliberately.
 
 ## References
 

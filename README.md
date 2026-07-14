@@ -16,7 +16,7 @@ Release page: [Kopeeer 1.0.0](https://github.com/vr4w/kopeeer/releases/tag/v1.0.
 
 **[Download Kopeeer-Setup-1.0.0.exe](https://github.com/vr4w/kopeeer/releases/download/v1.0.0/Kopeeer-Setup-1.0.0.exe)**
 
-This is the installer for normal Windows use. Download it, run it, and keep `Add Explorer context menu commands` enabled.
+This is the installer for normal Windows use. Download it, run it, and use Kopeeer from the Windows Explorer right-drag menu.
 
 Source code ZIPs do not contain the installer. Download the installer from the [GitHub Releases page](https://github.com/vr4w/kopeeer/releases/latest).
 
@@ -137,6 +137,8 @@ If the Explorer menu does not appear after installing, restart Explorer or sign 
 If Windows shows only the normal copy menu, make sure you are dragging with the right mouse button, then drop onto a folder and choose `Copy with Kopeeer` or `Move with Kopeeer`.
 
 If Kopeeer opens but does not copy, uninstall Kopeeer, install the latest `.exe` from the release page again, and retry with a small test file first.
+
+If Windows shows `Unknown publisher` or a SmartScreen warning, that is expected for now because Kopeeer is not code-signed yet. Only download the installer from the official GitHub Releases page, and compare the provided SHA256 checksum before installing.
 
 ## License
 

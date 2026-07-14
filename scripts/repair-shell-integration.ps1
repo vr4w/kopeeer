@@ -79,6 +79,30 @@ function Resolve-InstallDir {
     return Join-Path $env:ProgramFiles "Kopeeer"
 }
 
+function Resolve-ShellExtensionPath {
+    param(
+        [string]$InstallDir,
+        [string]$Version
+    )
+
+    $registeredShellPath = Get-RegValue "HKLM\Software\Kopeeer" "ShellExtensionPath"
+    if (-not [string]::IsNullOrWhiteSpace($registeredShellPath) -and (Test-Path -LiteralPath $registeredShellPath)) {
+        return $registeredShellPath
+    }
+
+    $shellRoot = Join-Path $InstallDir "Shell"
+    if (Test-Path -LiteralPath $shellRoot) {
+        $candidate = Get-ChildItem -LiteralPath $shellRoot -Filter "Kopeeer.ShellExtension.dll" -Recurse -File -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTimeUtc -Descending |
+            Select-Object -First 1
+        if ($candidate) {
+            return $candidate.FullName
+        }
+    }
+
+    return Join-Path $InstallDir "Shell\$Version\Kopeeer.ShellExtension.dll"
+}
+
 function Invoke-ShellRefresh {
     Add-Type -Namespace Kopeeer -Name ShellNotify -MemberDefinition @"
         [System.Runtime.InteropServices.DllImport("shell32.dll")]
@@ -96,7 +120,7 @@ if ([string]::IsNullOrWhiteSpace($version)) {
     $version = "1.0.1"
 }
 
-$shellPath = Join-Path $InstallDir "Shell\$version\Kopeeer.ShellExtension.dll"
+$shellPath = Resolve-ShellExtensionPath $InstallDir $version
 if (-not (Test-Path -LiteralPath $appPath)) {
     throw "Kopeeer app executable was not found: $appPath"
 }

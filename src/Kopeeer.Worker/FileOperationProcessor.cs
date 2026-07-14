@@ -2,9 +2,10 @@ using Kopeeer.Core;
 
 namespace Kopeeer.Worker;
 
-public sealed class FileOperationProcessor
+public sealed class FileOperationProcessor(IJobLogger? logger = null)
 {
     private const int BufferSize = 1024 * 1024;
+    private readonly IJobLogger? _logger = logger;
 
     public Task ProcessAsync(
         QueueJob job,
@@ -13,7 +14,7 @@ public sealed class FileOperationProcessor
         CancellationToken cancellationToken = default) =>
         Task.Run(() => Process(job, onProgress, onTargetConflict, cancellationToken), cancellationToken);
 
-    private static void Process(
+    private void Process(
         QueueJob job,
         Action<QueueJob>? onProgress,
         Func<QueueJob, string, TargetConflictResolution>? onTargetConflict,
@@ -42,7 +43,7 @@ public sealed class FileOperationProcessor
         ProcessDirectory(job, onProgress, onTargetConflict, cancellationToken);
     }
 
-    private static void ProcessFile(
+    private void ProcessFile(
         QueueJob job,
         Action<QueueJob>? onProgress,
         Func<QueueJob, string, TargetConflictResolution>? onTargetConflict,
@@ -59,7 +60,7 @@ public sealed class FileOperationProcessor
         }
     }
 
-    private static void ProcessDirectory(
+    private void ProcessDirectory(
         QueueJob job,
         Action<QueueJob>? onProgress,
         Func<QueueJob, string, TargetConflictResolution>? onTargetConflict,
@@ -78,7 +79,7 @@ public sealed class FileOperationProcessor
         }
     }
 
-    private static void CopyDirectory(
+    private void CopyDirectory(
         string sourceDirectory,
         string targetDirectory,
         QueueJob job,
@@ -100,7 +101,7 @@ public sealed class FileOperationProcessor
         }
     }
 
-    private static void CopyFileWithProgress(
+    private void CopyFileWithProgress(
         string sourceFile,
         string targetFile,
         QueueJob job,
@@ -110,34 +111,82 @@ public sealed class FileOperationProcessor
         job.CurrentItem = Path.GetFileName(sourceFile);
         onProgress?.Invoke(job);
 
-        using var source = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize);
-        using var target = new FileStream(targetFile, FileMode.CreateNew, FileAccess.Write, FileShare.None, BufferSize);
-        var buffer = new byte[BufferSize];
-        var started = DateTimeOffset.Now;
-        var lastProgress = DateTimeOffset.MinValue;
+        var temporaryTargetFile = BuildTemporaryTargetPath(targetFile);
 
-        while (true)
+        try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            var read = source.Read(buffer, 0, buffer.Length);
-            if (read == 0)
+            using (var source = new FileStream(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize))
+            using (var target = new FileStream(temporaryTargetFile, FileMode.CreateNew, FileAccess.Write, FileShare.None, BufferSize))
             {
-                break;
+                var buffer = new byte[BufferSize];
+                var started = DateTimeOffset.Now;
+                var lastProgress = DateTimeOffset.MinValue;
+
+                while (true)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var read = source.Read(buffer, 0, buffer.Length);
+                    if (read == 0)
+                    {
+                        break;
+                    }
+
+                    target.Write(buffer, 0, read);
+                    job.TransferredBytes += read;
+                    var elapsed = Math.Max((DateTimeOffset.Now - started).TotalSeconds, 0.001);
+                    job.BytesPerSecond = job.TransferredBytes / elapsed;
+
+                    if ((DateTimeOffset.Now - lastProgress).TotalMilliseconds >= 120)
+                    {
+                        lastProgress = DateTimeOffset.Now;
+                        onProgress?.Invoke(job);
+                    }
+                }
+
+                target.Flush(flushToDisk: true);
             }
 
-            target.Write(buffer, 0, read);
-            job.TransferredBytes += read;
-            var elapsed = Math.Max((DateTimeOffset.Now - started).TotalSeconds, 0.001);
-            job.BytesPerSecond = job.TransferredBytes / elapsed;
-
-            if ((DateTimeOffset.Now - lastProgress).TotalMilliseconds >= 120)
+            File.Move(temporaryTargetFile, targetFile);
+            onProgress?.Invoke(job);
+        }
+        catch (Exception exception)
+        {
+            if (File.Exists(temporaryTargetFile))
             {
-                lastProgress = DateTimeOffset.Now;
-                onProgress?.Invoke(job);
+                TryDeleteTemporaryFile(temporaryTargetFile, exception);
             }
+
+            throw;
+        }
+    }
+
+    private static string BuildTemporaryTargetPath(string targetFile)
+    {
+        var directory = Path.GetDirectoryName(targetFile) ?? string.Empty;
+        var fileName = Path.GetFileName(targetFile);
+        var candidate = Path.Combine(directory, $"{fileName}.kopeeer-part");
+
+        if (!File.Exists(candidate) && !Directory.Exists(candidate))
+        {
+            return candidate;
         }
 
-        onProgress?.Invoke(job);
+        return Path.Combine(directory, $"{fileName}.{Guid.NewGuid():N}.kopeeer-part");
+    }
+
+    private void TryDeleteTemporaryFile(string temporaryTargetFile, Exception originalException)
+    {
+        try
+        {
+            File.Delete(temporaryTargetFile);
+        }
+        catch (Exception cleanupException)
+        {
+            _logger?.CleanupFailed(temporaryTargetFile, cleanupException.Message);
+            throw new IOException(
+                $"{originalException.Message} Also failed to remove temporary file: {temporaryTargetFile}. {cleanupException.Message}",
+                originalException);
+        }
     }
 
     private static long GetDirectorySize(string directory)

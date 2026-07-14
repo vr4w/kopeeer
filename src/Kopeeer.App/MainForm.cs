@@ -53,7 +53,6 @@ public sealed class MainForm : Form
     private readonly RowStyle _queueRowStyle = new(SizeType.Absolute, 26);
     private CancellationTokenSource? _queueCancellationSource;
     private bool _closeAfterCancel;
-    private bool _forceCloseRequested;
 
     public MainForm(StartupQueueRequest? startupQueueRequest = null)
     {
@@ -61,13 +60,14 @@ public sealed class MainForm : Form
         StartPosition = FormStartPosition.CenterScreen;
         FormBorderStyle = FormBorderStyle.None;
         MaximizeBox = false;
+        KeyPreview = true;
         ClientSize = new Size(444, 198);
         BackColor = WindowBackground;
         Font = new Font("Segoe UI", 9F);
         Padding = new Padding(1);
 
         _logger = new FileJobLogger(AppDiagnostics.LogFilePath);
-        _queueProcessor = new SequentialQueueProcessor(_queue, new FileOperationProcessor(), _logger);
+        _queueProcessor = new SequentialQueueProcessor(_queue, new FileOperationProcessor(_logger), _logger);
         _logger.AppStarted();
 
         Controls.Add(BuildLayout());
@@ -225,13 +225,7 @@ public sealed class MainForm : Form
         _windowCloseButton.MouseLeave += (_, _) => _windowCloseButton.ForeColor = TextMuted;
         _windowCloseButton.Click += (_, _) =>
         {
-            if (_queueProcessor.IsRunning)
-            {
-                CancelQueue();
-                return;
-            }
-
-            Close();
+            CancelOrClose();
         };
     }
 
@@ -438,13 +432,7 @@ public sealed class MainForm : Form
         _cancelButton.Margin = new Padding(8, 28, 0, 12);
         _cancelButton.Click += (_, _) =>
         {
-            if (_queueProcessor.IsRunning)
-            {
-                CancelQueue();
-                return;
-            }
-
-            Close();
+            CancelOrClose();
         };
 
         layout.Controls.Add(_operationLabel, 0, 0);
@@ -647,7 +635,7 @@ public sealed class MainForm : Form
             RefreshActions();
             RefreshQueueList();
 
-            if (_closeAfterCancel && !IsDisposed && !_forceCloseRequested)
+            if (_closeAfterCancel && !IsDisposed)
             {
                 BeginInvoke((MethodInvoker)CloseWindowAfterCancel);
             }
@@ -656,12 +644,33 @@ public sealed class MainForm : Form
 
     private void CancelQueue()
     {
-        _forceCloseRequested = true;
         _closeAfterCancel = true;
         _cancelButton.Enabled = false;
         UpdateStatus("Canceling...");
+        Hide();
         _queueCancellationSource?.Cancel();
-        CloseWindowAfterCancel();
+    }
+
+    private void CancelOrClose()
+    {
+        if (_queueProcessor.IsRunning)
+        {
+            CancelQueue();
+            return;
+        }
+
+        Close();
+    }
+
+    protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+    {
+        if (keyData == Keys.Escape)
+        {
+            CancelOrClose();
+            return true;
+        }
+
+        return base.ProcessCmdKey(ref msg, keyData);
     }
 
     private void CloseWindowAfterCancel()
@@ -681,6 +690,13 @@ public sealed class MainForm : Form
 
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
+        if (_queueProcessor.IsRunning && !_closeAfterCancel)
+        {
+            e.Cancel = true;
+            CancelQueue();
+            return;
+        }
+
         _queueCancellationSource?.Cancel();
         base.OnFormClosing(e);
     }

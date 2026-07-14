@@ -21,6 +21,9 @@ public sealed class FileJobLogger(string logFilePath) : IJobLogger
     public void JobFailed(QueueJob job, string errorMessage) =>
         Write($"job failed id={job.Id} error=\"{errorMessage}\"");
 
+    public void CleanupFailed(string path, string errorMessage) =>
+        Write($"cleanup failed path=\"{path}\" error=\"{errorMessage}\"");
+
     private void Write(string message)
     {
         try

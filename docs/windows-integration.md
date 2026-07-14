@@ -62,7 +62,7 @@ Current behavior:
 
 - If Kopeeer is already running, Explorer enqueue requests are handed to the running window through a local named pipe.
 - Context menu requests start processing after the target folder is selected.
-- The installer can add or skip context menu registration through an explicit setup option.
+- The public installer registers the context menu integration as part of the main product workflow.
 - The context menu entries use separate copy and cut icons.
 
 ## Drag-and-drop Integration
@@ -150,7 +150,7 @@ Shell Extensions require clean registration and clean removal.
 The installer must:
 
 - Register the 64-bit COM component.
-- Offer optional Explorer integration.
+- Register Explorer integration clearly as part of the installer flow.
 - Unregister all components on uninstall.
 - Avoid leaving broken context menu entries.
 - Handle upgrades.

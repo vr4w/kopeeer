@@ -16,6 +16,19 @@ $installerDir = Join-Path $repoRoot "artifacts\installer"
 $dropHandlerDir = Join-Path $repoRoot "artifacts\publish\Kopeeer.Shell"
 $innoScript = Join-Path $repoRoot "installer\inno\Kopeeer.iss"
 $selfContainedValue = $SelfContained.ToString().ToLowerInvariant()
+$shellExtensionBuildId = $null
+
+try {
+    $shellExtensionBuildId = (& git -C $repoRoot rev-parse --short=12 HEAD 2>$null).Trim()
+} catch {
+    $shellExtensionBuildId = $null
+}
+
+if ([string]::IsNullOrWhiteSpace($shellExtensionBuildId)) {
+    $shellExtensionBuildId = Get-Date -Format "yyyyMMddHHmmss"
+}
+
+$shellExtensionBuildId = $shellExtensionBuildId -replace "[^A-Za-z0-9_.-]", "-"
 
 function Find-InnoCompiler {
     param([string]$ExplicitPath)
@@ -110,6 +123,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "Building installer with Inno Setup..."
 & $innoCompiler `
     "/DAppVersion=$Version" `
+    "/DShellExtensionBuildId=$shellExtensionBuildId" `
     "/DPublishDir=$publishDir" `
     "/DDropHandlerDir=$dropHandlerDir" `
     "/DOutputDir=$installerDir" `
